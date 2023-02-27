@@ -12,7 +12,7 @@
 
 #include "globals.hpp"
 #include "callbacks.hpp"
-#include "shaders.hpp"
+#include "shaders_provider.hpp"
 #include "text_rendering.hpp"
 #include "window_provider.hpp"
 
@@ -29,9 +29,11 @@ int game(){
     // biblioteca GLAD.
     gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
+    ShadersProvider shaderProvider = ShadersProvider();
+
     // Carregamos os shaders de vértices e de fragmentos que serão utilizados
     // para renderização. Veja slides 180-200 do documento Aula_03_Rendering_Pipeline_Grafico.pdf.
-    LoadShadersFromFiles();
+    shaderProvider.loadShadersFromFiles();
 
     // Construímos a representação de um triângulo
     GLuint vertex_array_object_id = BuildTriangles();
