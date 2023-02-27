@@ -7,7 +7,7 @@ LIBS_FOLDER = lib
 INCLUDES_FOLDER = include
 
 PROGRAM_NAME = MineGL
-TARGETS = main.cpp $(SRC_FOLDER)/game.cpp $(SRC_FOLDER)/glad.c $(SRC_FOLDER)/textrendering.cpp
+TARGETS = main.cpp $(SRC_FOLDER)/game.cpp $(SRC_FOLDER)/globals.cpp $(SRC_FOLDER)/gpu_program.cpp $(SRC_FOLDER)/shaders.cpp  $(SRC_FOLDER)/callbacks.cpp $(SRC_FOLDER)/lib/glad.c $(SRC_FOLDER)/text_rendering.cpp $(SRC_FOLDER)/window_provider.cpp
 LIBS = libglfw3.a
 LIBS_FLAGS = -lrt -lm -lXrandr -lX11 -lXxf86vm -lpthread -ldl -lXinerama -lXcursor
 

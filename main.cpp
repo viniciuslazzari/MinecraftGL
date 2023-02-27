@@ -4,8 +4,6 @@
 using namespace std;
 
 int main(){
-    printf("Hello world");
-
     game();
 
     return 0;
