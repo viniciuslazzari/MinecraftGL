@@ -6,7 +6,8 @@ WindowProvider::WindowProvider(int width, int height, string title){
     this->title = title;
 };
 
-GLFWwindow* WindowProvider::initWindow(GLFWerrorfun errorCallback, GLFWkeyfun keyCallback, GLFWmousebuttonfun mouseButtonCallback, GLFWcursorposfun cursorPosCallback, GLFWscrollfun scrollCallback, GLFWframebuffersizefun framebufferSizeCallback){
+GLFWwindow* WindowProvider::initWindow(GLFWerrorfun errorCallback, GLFWkeyfun keyCallback, GLFWmousebuttonfun mouseButtonCallback, 
+                                       GLFWcursorposfun cursorPosCallback, GLFWscrollfun scrollCallback, GLFWframebuffersizefun framebufferSizeCallback){
     int success = glfwInit();
 
     if (!success){

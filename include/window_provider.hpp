@@ -15,7 +15,8 @@ class WindowProvider {
     public:
         WindowProvider(int width, int height, string title);
 
-        GLFWwindow* initWindow(GLFWerrorfun errorCallback, GLFWkeyfun keyCallback, GLFWmousebuttonfun mouseButtonCallback, GLFWcursorposfun cursorPosCallback, GLFWscrollfun scrollCallback, GLFWframebuffersizefun framebufferSizeCallback);
+        GLFWwindow* initWindow(GLFWerrorfun errorCallback, GLFWkeyfun keyCallback, GLFWmousebuttonfun mouseButtonCallback, 
+                               GLFWcursorposfun cursorPosCallback, GLFWscrollfun scrollCallback, GLFWframebuffersizefun framebufferSizeCallback);
 };
 
 #endif
