@@ -117,23 +117,10 @@ int game(){
         float nearplane = -0.1f;  // Posição do "near plane"
         float farplane  = -10.0f; // Posição do "far plane"
 
-        if (g_UsePerspectiveProjection){
-            // Projeção Perspectiva.
-            // Para definição do field of view (FOV), veja slides 205-215 do documento Aula_09_Projecoes.pdf.
-            float field_of_view = 3.141592 / 3.0f;
-            projection = Matrix_Perspective(field_of_view, g_ScreenRatio, nearplane, farplane);
-        }else{
-            // Projeção Ortográfica.
-            // Para definição dos valores l, r, b, t ("left", "right", "bottom", "top"),
-            // PARA PROJEÇÃO ORTOGRÁFICA veja slides 219-224 do documento Aula_09_Projecoes.pdf.
-            // Para simular um "zoom" ortográfico, computamos o valor de "t"
-            // utilizando a variável g_CameraDistance.
-            float t = 1.5f*g_CameraDistance/2.5f;
-            float b = -t;
-            float r = t*g_ScreenRatio;
-            float l = -r;
-            projection = Matrix_Orthographic(l, r, b, t, nearplane, farplane);
-        }
+        // Projeção Perspectiva.
+        // Para definição do field of view (FOV), veja slides 205-215 do documento Aula_09_Projecoes.pdf.
+        float field_of_view = 3.141592 / 3.0f;
+        projection = Matrix_Perspective(field_of_view, g_ScreenRatio, nearplane, farplane);
 
         // Enviamos as matrizes "view" e "projection" para a placa de vídeo
         // (GPU). Veja o arquivo "shader_vertex.glsl", onde estas são
@@ -166,10 +153,7 @@ int game(){
                 // A terceira cópia do cubo sofrerá rotações em X,Y e Z (nessa
                 // ordem) seguindo o sistema de ângulos de Euler, e após uma
                 // translação em X. Veja slides 106-107 do documento Aula_07_Transformacoes_Geometricas_3D.pdf.
-                model = Matrix_Translate(-2.0f, 0.0f, 0.0f) // QUARTO translação
-                      * Matrix_Rotate_Z(g_AngleZ)  // TERCEIRO rotação Z de Euler
-                      * Matrix_Rotate_Y(g_AngleY)  // SEGUNDO rotação Y de Euler
-                      * Matrix_Rotate_X(g_AngleX); // PRIMEIRO rotação X de Euler
+                model = Matrix_Translate(-2.0f, 0.0f, 0.0f);
 
                 // Armazenamos as matrizes model, view, e projection do terceiro cubo
                 // para mostrar elas na tela através da função TextRendering_ShowModelViewProjection().
@@ -199,10 +183,10 @@ int game(){
             // função BuildTriangles(), e veja a documentação da função
             // glDrawElements() em http://docs.gl/gl3/glDrawElements.
             glDrawElements(
-                g_VirtualScene["cube_faces"].rendering_mode, // Veja slides 182-188 do documento Aula_04_Modelagem_Geometrica_3D.pdf
-                g_VirtualScene["cube_faces"].num_indices,
+                g_VirtualScene["cube_faces"].renderingMode, // Veja slides 182-188 do documento Aula_04_Modelagem_Geometrica_3D.pdf
+                g_VirtualScene["cube_faces"].numIndexes,
                 GL_UNSIGNED_INT,
-                (void*)g_VirtualScene["cube_faces"].first_index
+                (void*)g_VirtualScene["cube_faces"].firstIndex
             );
 
             // Pedimos para OpenGL desenhar linhas com largura de 4 pixels.
@@ -219,10 +203,10 @@ int game(){
             // geométricas que o cubo. Isto é, estes eixos estarão
             // representando o sistema de coordenadas do modelo (e não o global)!
             glDrawElements(
-                g_VirtualScene["axes"].rendering_mode,
-                g_VirtualScene["axes"].num_indices,
+                g_VirtualScene["axes"].renderingMode,
+                g_VirtualScene["axes"].numIndexes,
                 GL_UNSIGNED_INT,
-                (void*)g_VirtualScene["axes"].first_index
+                (void*)g_VirtualScene["axes"].firstIndex
             );
 
             // Informamos para a placa de vídeo (GPU) que a variável booleana
@@ -236,10 +220,10 @@ int game(){
             // BuildTriangles(), e veja a documentação da função
             // glDrawElements() em http://docs.gl/gl3/glDrawElements.
             glDrawElements(
-                g_VirtualScene["cube_edges"].rendering_mode,
-                g_VirtualScene["cube_edges"].num_indices,
+                g_VirtualScene["cube_edges"].renderingMode,
+                g_VirtualScene["cube_edges"].numIndexes,
                 GL_UNSIGNED_INT,
-                (void*)g_VirtualScene["cube_edges"].first_index
+                (void*)g_VirtualScene["cube_edges"].firstIndex
             );
 
             // Desenhamos um ponto de tamanho 15 pixels em cima do terceiro vértice
@@ -274,10 +258,10 @@ int game(){
         // a documentação da função glDrawElements() em
         // http://docs.gl/gl3/glDrawElements.
         glDrawElements(
-            g_VirtualScene["axes"].rendering_mode,
-            g_VirtualScene["axes"].num_indices,
+            g_VirtualScene["axes"].renderingMode,
+            g_VirtualScene["axes"].numIndexes,
             GL_UNSIGNED_INT,
-            (void*)g_VirtualScene["axes"].first_index
+            (void*)g_VirtualScene["axes"].firstIndex
         );
 
         // "Desligamos" o VAO, evitando assim que operações posteriores venham a
@@ -498,9 +482,9 @@ GLuint BuildTriangles(){
     // coloridas do cubo.
     SceneObject cube_faces;
     cube_faces.name           = "Cubo (faces coloridas)";
-    cube_faces.first_index    = (void*)0; // Primeiro índice está em indices[0]
-    cube_faces.num_indices    = 36;       // Último índice está em indices[35]; total de 36 índices.
-    cube_faces.rendering_mode = GL_TRIANGLES; // Índices correspondem ao tipo de rasterização GL_TRIANGLES.
+    cube_faces.firstIndex    = (void*)0; // Primeiro índice está em indices[0]
+    cube_faces.numIndexes    = 36;       // Último índice está em indices[35]; total de 36 índices.
+    cube_faces.renderingMode = GL_TRIANGLES; // Índices correspondem ao tipo de rasterização GL_TRIANGLES.
 
     // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
     g_VirtualScene["cube_faces"] = cube_faces;
@@ -509,9 +493,9 @@ GLuint BuildTriangles(){
     // pretas do cubo.
     SceneObject cube_edges;
     cube_edges.name           = "Cubo (arestas pretas)";
-    cube_edges.first_index    = (void*)(36*sizeof(GLuint)); // Primeiro índice está em indices[36]
-    cube_edges.num_indices    = 24; // Último índice está em indices[59]; total de 24 índices.
-    cube_edges.rendering_mode = GL_LINES; // Índices correspondem ao tipo de rasterização GL_LINES.
+    cube_edges.firstIndex    = (void*)(36*sizeof(GLuint)); // Primeiro índice está em indices[36]
+    cube_edges.numIndexes    = 24; // Último índice está em indices[59]; total de 24 índices.
+    cube_edges.renderingMode = GL_LINES; // Índices correspondem ao tipo de rasterização GL_LINES.
 
     // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
     g_VirtualScene["cube_edges"] = cube_edges;
@@ -519,9 +503,9 @@ GLuint BuildTriangles(){
     // Criamos um terceiro objeto virtual (SceneObject) que se refere aos eixos XYZ.
     SceneObject axes;
     axes.name           = "Eixos XYZ";
-    axes.first_index    = (void*)(60*sizeof(GLuint)); // Primeiro índice está em indices[60]
-    axes.num_indices    = 6; // Último índice está em indices[65]; total de 6 índices.
-    axes.rendering_mode = GL_LINES; // Índices correspondem ao tipo de rasterização GL_LINES.
+    axes.firstIndex    = (void*)(60*sizeof(GLuint)); // Primeiro índice está em indices[60]
+    axes.numIndexes    = 6; // Último índice está em indices[65]; total de 6 índices.
+    axes.renderingMode = GL_LINES; // Índices correspondem ao tipo de rasterização GL_LINES.
     g_VirtualScene["axes"] = axes;
 
     // Criamos um buffer OpenGL para armazenar os índices acima
