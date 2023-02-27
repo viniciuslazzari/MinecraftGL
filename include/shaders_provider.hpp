@@ -1,6 +1,8 @@
 #ifndef SHADERS_PROVIDER_H
 #define SHADERS_PROVIDER_H
 
+#include <glad/glad.h>
+
 class ShadersProvider {
     private:
         const char* vertexShaderFilename = "./src/shaders/shader_vertex.glsl";
@@ -9,7 +11,7 @@ class ShadersProvider {
         GLuint fragmentShader;
 
     public:
-        void loadShadersFromFiles();
+        GLuint loadShadersFromFiles();
         GLuint loadShaderByType(const char* filename, GLenum shaderType);
         void loadShader(const char* filename, GLuint shaderId);
 };

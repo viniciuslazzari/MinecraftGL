@@ -13,7 +13,6 @@
 #include "globals.hpp"
 #include "callbacks.hpp"
 #include "shaders_provider.hpp"
-#include "text_rendering.hpp"
 #include "window_provider.hpp"
 
 // Declaração de várias funções utilizadas em main().  Essas estão definidas
@@ -25,15 +24,14 @@ int game(){
 
     GLFWwindow* window = windowProvider.initWindow(ErrorCallback, KeyCallback, MouseButtonCallback, CursorPosCallback, ScrollCallback, FramebufferSizeCallback);
 
-    // Carregamento de todas funções definidas por OpenGL 3.3, utilizando a
-    // biblioteca GLAD.
+    // Carregamento de todas funções definidas por OpenGL 3.3, utilizando a biblioteca GLAD.
     gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
     ShadersProvider shaderProvider = ShadersProvider();
 
     // Carregamos os shaders de vértices e de fragmentos que serão utilizados
     // para renderização. Veja slides 180-200 do documento Aula_03_Rendering_Pipeline_Grafico.pdf.
-    shaderProvider.loadShadersFromFiles();
+    GLuint programId = shaderProvider.loadShadersFromFiles();
 
     // Construímos a representação de um triângulo
     GLuint vertex_array_object_id = BuildTriangles();
@@ -41,10 +39,10 @@ int game(){
     // Buscamos o endereço das variáveis definidas dentro do Vertex Shader.
     // Utilizaremos estas variáveis para enviar dados para a placa de vídeo
     // (GPU)! Veja arquivo "shader_vertex.glsl".
-    GLint model_uniform           = glGetUniformLocation(g_GpuProgramID, "model"); // Variável da matriz "model"
-    GLint view_uniform            = glGetUniformLocation(g_GpuProgramID, "view"); // Variável da matriz "view" em shader_vertex.glsl
-    GLint projection_uniform      = glGetUniformLocation(g_GpuProgramID, "projection"); // Variável da matriz "projection" em shader_vertex.glsl
-    GLint render_as_black_uniform = glGetUniformLocation(g_GpuProgramID, "render_as_black"); // Variável booleana em shader_vertex.glsl
+    GLint model_uniform           = glGetUniformLocation(programId, "model"); // Variável da matriz "model"
+    GLint view_uniform            = glGetUniformLocation(programId, "view"); // Variável da matriz "view" em shader_vertex.glsl
+    GLint projection_uniform      = glGetUniformLocation(programId, "projection"); // Variável da matriz "projection" em shader_vertex.glsl
+    GLint render_as_black_uniform = glGetUniformLocation(programId, "render_as_black"); // Variável booleana em shader_vertex.glsl
 
     // Habilitamos o Z-buffer. Veja slides 104-116 do documento Aula_09_Projecoes.pdf.
     glEnable(GL_DEPTH_TEST);
@@ -75,7 +73,7 @@ int game(){
 
         // Pedimos para a GPU utilizar o programa de GPU criado acima (contendo
         // os shaders de vértice e fragmentos).
-        glUseProgram(g_GpuProgramID);
+        glUseProgram(programId);
 
         // "Ligamos" o VAO. Informamos que queremos utilizar os atributos de
         // vértices apontados pelo VAO criado pela função BuildTriangles(). Veja

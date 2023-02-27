@@ -32,8 +32,5 @@ float g_CameraDistance = 2.5f; // Distância da câmera para a origem
 // Variável que controla o tipo de projeção utilizada: perspectiva ou ortográfica.
 bool g_UsePerspectiveProjection = true;
 
-// Variáveis que definem um programa de GPU (shaders). Veja função LoadShadersFromFiles().
-GLuint g_GpuProgramID = 0;
-
 double g_LastCursorPosX = 0.0f;
 double g_LastCursorPosY = 0.0f;
