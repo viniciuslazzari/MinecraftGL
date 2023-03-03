@@ -19,10 +19,12 @@ class SceneObject {
 // estes são acessados.
 extern std::map<const char*, SceneObject> g_VirtualScene;
 
+extern bool windowIsFocused;
+
 // Razão de proporção da janela (largura/altura). Veja função FramebufferSizeCallback().
 extern float g_ScreenRatio;
 
-extern float g_Camera;
+extern int g_Camera;
 extern float g_CameraSpeed;
 
 // "g_LeftMouseButtonPressed se o usuário está com o botão esquerdo do mouse
@@ -33,11 +35,16 @@ extern bool g_LeftMouseButtonPressed;
 // usuário através do mouse (veja função CursorPosCallback()). A posição
 // efetiva da câmera é calculada dentro da função main(), dentro do loop de
 // renderização.
-extern float g_CameraTheta;     // Ângulo no plano ZX em relação ao eixo Z
-extern float g_CameraPhi;       // Ângulo em relação ao eixo Y
+extern float g_CameraThetaFree;     // Ângulo no plano ZX em relação ao eixo Z
+extern float g_CameraPhiFree;       // Ângulo em relação ao eixo Y
+extern float g_CameraThetaLook;     // Ângulo no plano ZX em relação ao eixo Z
+extern float g_CameraPhiLook;       // Ângulo em relação ao eixo Y
 extern float g_CameraDistance;  // Distância da câmera para a origem
 
 // Variáveis globais que armazenam a última posição do cursor do mouse, para
 // que possamos calcular quanto que o mouse se movimentou entre dois instantes
 // de tempo. Utilizadas no callback CursorPosCallback() abaixo.
 extern double g_LastCursorPosX, g_LastCursorPosY;
+
+extern bool isFreeCamera;
+extern bool cameraModeChanged;

@@ -39,9 +39,9 @@ int game(){
     // Buscamos o endereço das variáveis definidas dentro do Vertex Shader.
     // Utilizaremos estas variáveis para enviar dados para a placa de vídeo
     // (GPU)! Veja arquivo "shader_vertex.glsl".
-    GLint model_uniform           = glGetUniformLocation(programId, "model"); // Variável da matriz "model"
-    GLint view_uniform            = glGetUniformLocation(programId, "view"); // Variável da matriz "view" em shader_vertex.glsl
-    GLint projection_uniform      = glGetUniformLocation(programId, "projection"); // Variável da matriz "projection" em shader_vertex.glsl
+    GLint model_uniform = glGetUniformLocation(programId, "model"); // Variável da matriz "model"
+    GLint view_uniform = glGetUniformLocation(programId, "view"); // Variável da matriz "view" em shader_vertex.glsl
+    GLint projection_uniform = glGetUniformLocation(programId, "projection"); // Variável da matriz "projection" em shader_vertex.glsl
     GLint render_as_black_uniform = glGetUniformLocation(programId, "render_as_black"); // Variável booleana em shader_vertex.glsl
 
     // Habilitamos o Z-buffer. Veja slides 104-116 do documento Aula_09_Projecoes.pdf.
@@ -53,12 +53,12 @@ int game(){
     glm::mat4 the_model;
     glm::mat4 the_view;
 
-    glm::vec4 camera_position_c  = glm::vec4(-1.0f,1.0f,-5.0f,1.0f); 
+    glm::vec4 camera_up_vector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f); 
+    glm::vec4 camera_position_c_free = glm::vec4(-1.0f, 1.0f, 5.0f, 1.0f);
+    glm::vec4 camera_view_vector;
 
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window)){
-        // Aqui executamos as operações de renderização
-
         // Definimos a cor do "fundo" do framebuffer como branco.  Tal cor é
         // definida como coeficientes RGBA: Red, Green, Blue, Alpha; isto é:
         // Vermelho, Verde, Azul, Alpha (valor de transparência).
@@ -86,36 +86,60 @@ int game(){
         // e ScrollCallback().
         float r = g_CameraDistance;
 
-        float y = r*sin(g_CameraPhi) ;
-        float z = r*cos(g_CameraPhi)*cos(g_CameraTheta);
-        float x = r*cos(g_CameraPhi)*sin(g_CameraTheta);
+        float cameraTheta = 0.0f;
+        float cameraPhi = 0.0f;
 
-        // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
-        // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
-       // Ponto "c", centro da câmera
-        // Ponto "l", para onde a câmera (look-at) estará sempre olhando
-        glm::vec4 camera_view_vector = glm::vec4(x,y,z,0.0f); // Vetor "view", sentido para onde a câmera está virada
-        glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
-        
-        glm::vec4 w = -camera_view_vector / norm(-camera_view_vector);
-        glm::vec4 u = crossproduct(camera_up_vector, w) / norm(crossproduct(camera_up_vector, w));
+        if (isFreeCamera) {
+            cameraTheta = g_CameraThetaFree;
+            cameraPhi = g_CameraPhiFree;
+        }
+        else{
+            cameraTheta = g_CameraThetaLook;
+            cameraPhi = g_CameraPhiLook;             
+        }
 
-        if (g_Camera == 1) camera_position_c += -w * g_CameraSpeed;
-        if (g_Camera == 2) camera_position_c += w * g_CameraSpeed;
-        if (g_Camera == 3) camera_position_c += -u * g_CameraSpeed;
-        if (g_Camera == 4) camera_position_c += u * g_CameraSpeed;
+        float y = -r * sin(cameraPhi) ;
+        float z = -r * cos(cameraPhi) * cos(cameraTheta);
+        float x = -r * cos(cameraPhi) * sin(cameraTheta);
 
-        // Computamos a matriz "View" utilizando os parâmetros da câmera para
-        // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
-        glm::mat4 view = Matrix_Camera_View(camera_position_c, camera_view_vector, camera_up_vector);
+        glm::vec4 camera_position_c_look;
+
+        printf("%f %f %f\n", x, y, z);
+
+        glm::mat4 view;
+
+        if (isFreeCamera){
+            camera_view_vector = glm::vec4(x, y, z, 0.0f); // Vetor "view", sentido para onde a câmera está virada
+            
+            glm::vec4 w = -camera_view_vector / norm(-camera_view_vector);
+            glm::vec4 u = crossproduct(camera_up_vector, w) / norm(crossproduct(camera_up_vector, w));
+
+            if (g_Camera == 1) camera_position_c_free += -w * g_CameraSpeed;
+            if (g_Camera == 2) camera_position_c_free += w * g_CameraSpeed;
+            if (g_Camera == 3) camera_position_c_free += -u * g_CameraSpeed;
+            if (g_Camera == 4) camera_position_c_free += u * g_CameraSpeed;
+
+            view = Matrix_Camera_View(camera_position_c_free, camera_view_vector, camera_up_vector);
+        }
+        else{
+            camera_position_c_look = glm::vec4(x, y, z, 1.0f); // Ponto "c", centro da câmera
+            glm::vec4 camera_lookat_l = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+            camera_view_vector = camera_lookat_l - camera_position_c_look; // Vetor "view", sentido para onde a câmera está virada     
+
+            view = Matrix_Camera_View(camera_position_c_look, camera_view_vector, camera_up_vector);
+        }
 
         // Agora computamos a matriz de Projeção.
         glm::mat4 projection;
+        //glm::vec4 camera_view_vector;
 
         // Note que, no sistema de coordenadas da câmera, os planos near e far
         // estão no sentido negativo! Veja slides 176-204 do documento Aula_09_Projecoes.pdf.
         float nearplane = -0.1f;  // Posição do "near plane"
         float farplane  = -10.0f; // Posição do "far plane"
+
+        // Computamos a matriz "View" utilizando os parâmetros da câmera para
+        // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
 
         // Projeção Perspectiva.
         // Para definição do field of view (FOV), veja slides 205-215 do documento Aula_09_Projecoes.pdf.
@@ -125,8 +149,8 @@ int game(){
         // Enviamos as matrizes "view" e "projection" para a placa de vídeo
         // (GPU). Veja o arquivo "shader_vertex.glsl", onde estas são
         // efetivamente aplicadas em todos os pontos.
-        glUniformMatrix4fv(view_uniform       , 1 , GL_FALSE , glm::value_ptr(view));
-        glUniformMatrix4fv(projection_uniform , 1 , GL_FALSE , glm::value_ptr(projection));
+        glUniformMatrix4fv(view_uniform, 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(projection_uniform, 1, GL_FALSE, glm::value_ptr(projection));
 
         // Vamos desenhar 3 instâncias (cópias) do cubo
         for (int i = 1; i <= 3; ++i){

@@ -6,10 +6,12 @@
 // estes são acessados.
 std::map<const char*, SceneObject> g_VirtualScene;
 
+bool windowIsFocused = false;
+
 // Razão de proporção da janela (largura/altura). Veja função FramebufferSizeCallback().
 float g_ScreenRatio = 1.0f;
 
-float g_Camera = 0.0f;
+int g_Camera = 0.0;
 float g_CameraSpeed = 0.1f;
 
 // "g_LeftMouseButtonPressed = true" se o usuário está com o botão esquerdo do mouse
@@ -20,9 +22,14 @@ bool g_LeftMouseButtonPressed = false;
 // usuário através do mouse (veja função CursorPosCallback()). A posição
 // efetiva da câmera é calculada dentro da função main(), dentro do loop de
 // renderização.
-float g_CameraTheta = 0.0f; // Ângulo no plano ZX em relação ao eixo Z
-float g_CameraPhi = 0.0f;   // Ângulo em relação ao eixo Y
+float g_CameraThetaFree = 0.0f; // Ângulo no plano ZX em relação ao eixo Z
+float g_CameraPhiFree = 0.0f;   // Ângulo em relação ao eixo Y
+float g_CameraThetaLook = 0.0f; // Ângulo no plano ZX em relação ao eixo Z
+float g_CameraPhiLook = 0.0f;   // Ângulo em relação ao eixo Y
 float g_CameraDistance = 2.5f; // Distância da câmera para a origem
 
 double g_LastCursorPosX = 0.0f;
 double g_LastCursorPosY = 0.0f;
+
+bool isFreeCamera = true;
+bool cameraModeChanged = true;
