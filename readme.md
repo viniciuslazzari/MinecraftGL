@@ -6,8 +6,8 @@ A minecraft implementation using C++ and OpenGL.
 
 - [ ] Complex poligonal mesh
 - [ ] Geometric tranforms made by user
-- [ ] Free camera
-- [ ] Look-at camera
+- [X] Free camera
+- [X] Look-at camera
 - [ ] Object instances
 - [ ] Three types of intersection test
 - [ ] Difuse lighting model
