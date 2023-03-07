@@ -1,4 +1,8 @@
+#ifndef GLOBALS_H
+#define GLOBALS_H
+
 #include <map>
+#include <string>
 
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
@@ -7,17 +11,18 @@
 // cada objeto da cena virtual.
 class SceneObject {
     public:
-        const char* name;
-        void* firstIndex;
-        int numIndexes;
+        std::string name;
+        size_t firstIndex;
+        size_t numIndexes;
         GLenum renderingMode;
+        GLuint id;
 };
 
 // A cena virtual é uma lista de objetos nomeados, guardados em um dicionário
 // (map). Veja dentro da função BuildTriangles() como que são incluídos
 // objetos dentro da variável g_VirtualScene, e veja na função main() como
 // estes são acessados.
-extern std::map<const char*, SceneObject> g_VirtualScene;
+extern std::map<std::string, SceneObject> g_VirtualScene;
 
 extern bool windowIsFocused;
 
@@ -48,3 +53,5 @@ extern double g_LastCursorPosX, g_LastCursorPosY;
 
 extern bool isFreeCamera;
 extern bool cameraModeChanged;
+
+#endif

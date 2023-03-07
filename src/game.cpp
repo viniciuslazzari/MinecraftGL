@@ -4,16 +4,17 @@
 #include <glfw/glfw3.h>
 
 #include <glm/mat4x4.hpp>
-#include <glm/vec4.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "std/utils.h"
 #include "std/matrices.h"
 
+#include "game.hpp"
 #include "globals.hpp"
 #include "callbacks.hpp"
 #include "shaders_provider.hpp"
 #include "window_provider.hpp"
+#include "obj_loader.hpp"
 
 // Declaração de várias funções utilizadas em main().  Essas estão definidas
 // logo após a definição de main() neste arquivo.
@@ -33,6 +34,10 @@ int game(){
     // para renderização. Veja slides 180-200 do documento Aula_03_Rendering_Pipeline_Grafico.pdf.
     GLuint programId = shaderProvider.loadShadersFromFiles();
 
+    ObjModel cowModel("assets/cow.obj");
+    cowModel.ComputeNormals();
+    cowModel.BuildTrianglesAndAddToVirtualScene();
+
     // Construímos a representação de um triângulo
     GLuint vertex_array_object_id = BuildTriangles();
 
@@ -42,6 +47,7 @@ int game(){
     GLint model_uniform = glGetUniformLocation(programId, "model"); // Variável da matriz "model"
     GLint view_uniform = glGetUniformLocation(programId, "view"); // Variável da matriz "view" em shader_vertex.glsl
     GLint projection_uniform = glGetUniformLocation(programId, "projection"); // Variável da matriz "projection" em shader_vertex.glsl
+    GLint object_id_uniform = glGetUniformLocation(programId, "object_id"); // Variável booleana em shader_vertex.glsl
     GLint render_as_black_uniform = glGetUniformLocation(programId, "render_as_black"); // Variável booleana em shader_vertex.glsl
 
     // Habilitamos o Z-buffer. Veja slides 104-116 do documento Aula_09_Projecoes.pdf.
@@ -103,8 +109,6 @@ int game(){
         float x = -r * cos(cameraPhi) * sin(cameraTheta);
 
         glm::vec4 camera_position_c_look;
-
-        printf("%f %f %f\n", x, y, z);
 
         glm::mat4 view;
 
@@ -249,48 +253,16 @@ int game(){
                 GL_UNSIGNED_INT,
                 (void*)g_VirtualScene["cube_edges"].firstIndex
             );
-
-            // Desenhamos um ponto de tamanho 15 pixels em cima do terceiro vértice
-            // do terceiro cubo. Este vértice tem coordenada de modelo igual à
-            // (0.5, 0.5, 0.5, 1.0).
-            if ( i == 3 ){
-                glPointSize(15.0f);
-                glDrawArrays(GL_POINTS, 3, 1);
-            }
         }
 
-        // Agora queremos desenhar os eixos XYZ de coordenadas GLOBAIS.
-        // Para tanto, colocamos a matriz de modelagem igual à identidade.
-        // Veja slides 2-14 e 184-190 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
-        glm::mat4 model = Matrix_Identity();
-
-        // Enviamos a nova matriz "model" para a placa de vídeo (GPU). Veja o
-        // arquivo "shader_vertex.glsl".
-        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-
-        // Pedimos para OpenGL desenhar linhas com largura de 10 pixels.
-        glLineWidth(10.0f);
-
-        // Informamos para a placa de vídeo (GPU) que a variável booleana
-        // "render_as_black" deve ser colocada como "false". Veja o arquivo
-        // "shader_vertex.glsl".
         glUniform1i(render_as_black_uniform, false);
 
-        // Pedimos para a GPU rasterizar os vértices dos eixos XYZ
-        // apontados pelo VAO como linhas. Veja a definição de
-        // g_VirtualScene["axes"] dentro da função BuildTriangles(), e veja
-        // a documentação da função glDrawElements() em
-        // http://docs.gl/gl3/glDrawElements.
-        glDrawElements(
-            g_VirtualScene["axes"].renderingMode,
-            g_VirtualScene["axes"].numIndexes,
-            GL_UNSIGNED_INT,
-            (void*)g_VirtualScene["axes"].firstIndex
-        );
+        #define COW 4
 
-        // "Desligamos" o VAO, evitando assim que operações posteriores venham a
-        // alterar o mesmo. Isso evita bugs.
-        glBindVertexArray(0);
+        glm::mat4 model = Matrix_Translate(-2.0f, 0.0f, -2.0f);
+        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(object_id_uniform, COW);
+        cowModel.DrawVirtualObject("the_cow");
 
         // O framebuffer onde OpenGL executa as operações de renderização não
         // é o mesmo que está sendo mostrado para o usuário, caso contrário
@@ -506,7 +478,7 @@ GLuint BuildTriangles(){
     // coloridas do cubo.
     SceneObject cube_faces;
     cube_faces.name           = "Cubo (faces coloridas)";
-    cube_faces.firstIndex    = (void*)0; // Primeiro índice está em indices[0]
+    cube_faces.firstIndex    = 0; // Primeiro índice está em indices[0]
     cube_faces.numIndexes    = 36;       // Último índice está em indices[35]; total de 36 índices.
     cube_faces.renderingMode = GL_TRIANGLES; // Índices correspondem ao tipo de rasterização GL_TRIANGLES.
 
@@ -517,7 +489,7 @@ GLuint BuildTriangles(){
     // pretas do cubo.
     SceneObject cube_edges;
     cube_edges.name           = "Cubo (arestas pretas)";
-    cube_edges.firstIndex    = (void*)(36*sizeof(GLuint)); // Primeiro índice está em indices[36]
+    cube_edges.firstIndex    = 36 * sizeof(GLuint); // Primeiro índice está em indices[36]
     cube_edges.numIndexes    = 24; // Último índice está em indices[59]; total de 24 índices.
     cube_edges.renderingMode = GL_LINES; // Índices correspondem ao tipo de rasterização GL_LINES.
 
@@ -527,7 +499,7 @@ GLuint BuildTriangles(){
     // Criamos um terceiro objeto virtual (SceneObject) que se refere aos eixos XYZ.
     SceneObject axes;
     axes.name           = "Eixos XYZ";
-    axes.firstIndex    = (void*)(60*sizeof(GLuint)); // Primeiro índice está em indices[60]
+    axes.firstIndex    = 60 * sizeof(GLuint); // Primeiro índice está em indices[60]
     axes.numIndexes    = 6; // Último índice está em indices[65]; total de 6 índices.
     axes.renderingMode = GL_LINES; // Índices correspondem ao tipo de rasterização GL_LINES.
     g_VirtualScene["axes"] = axes;
