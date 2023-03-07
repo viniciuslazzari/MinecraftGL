@@ -4,7 +4,7 @@ A minecraft implementation using C++ and OpenGL.
 
 ## Checkpoints
 
-- [ ] Complex poligonal mesh
+- [X] Complex poligonal mesh
 - [ ] Geometric tranforms made by user
 - [X] Free camera
 - [X] Look-at camera
