@@ -1,7 +1,7 @@
 #ifndef OBJ_LOADER_H
 #define OBJ_LOADER_H
 
-#include "tiny_obj_loader/index.h"
+#include "tiny_obj_loader/tiny_obj_loader.h"
 
 class ObjModel {
     private:
