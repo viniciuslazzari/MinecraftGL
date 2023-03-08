@@ -16,4 +16,4 @@ A minecraft implementation using C++ and OpenGL.
 - [ ] Gouraud interpolation model
 - [ ] Texture mapping
 - [ ] Cubic Bézier moving
-- [ ] Time-base animations
+- [X] Time-base animations
