@@ -7,6 +7,8 @@
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
+#include "camera.hpp"
+
 // Definimos uma estrutura que armazenará dados necessários para renderizar
 // cada objeto da cena virtual.
 class SceneObject {
@@ -52,6 +54,9 @@ extern float g_CameraDistance;  // Distância da câmera para a origem
 extern double g_LastCursorPosX, g_LastCursorPosY;
 
 extern bool isFreeCamera;
-extern bool cameraModeChanged;
+
+extern double deltaTime;
+
+extern Camera camera;
 
 #endif

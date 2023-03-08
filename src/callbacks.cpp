@@ -21,7 +21,7 @@ void FramebufferSizeCallback(GLFWwindow* window, int width, int height){
     //
     // O cast para float é necessário pois números inteiros são arredondados ao
     // serem divididos!
-    g_ScreenRatio = (float)width / height;
+    camera.updateScreenRatio((float) width / height);
 }
 
 // Função callback chamada sempre que o usuário aperta algum dos botões do mouse
@@ -59,40 +59,11 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos){
 
     if (!windowIsFocused) return;
 
-    // int height, width;
-
-    // glfwGetWindowSize(&width, &height);
-
     // Deslocamento do cursor do mouse em x e y de coordenadas de tela!
     float dx = xpos - g_LastCursorPosX;
     float dy = ypos - g_LastCursorPosY;
 
-    // Em coordenadas esféricas, o ângulo phi deve ficar entre -pi/2 e +pi/2.
-    float phimax = 3.141592f / 2;
-    float phimin = -phimax;
-
-    if (isFreeCamera){
-        // Atualizamos parâmetros da câmera com os deslocamentos
-        g_CameraThetaFree -= 0.0005f * dx;
-        g_CameraPhiFree += 0.0005f * dy;
-
-        if (g_CameraPhiFree > phimax)
-            g_CameraPhiFree = phimax;
-
-        if (g_CameraPhiFree < phimin)
-            g_CameraPhiFree = phimin;
-    }
-    else{
-        // Atualizamos parâmetros da câmera com os deslocamentos
-        g_CameraThetaLook -= 0.0005f * dx;
-        g_CameraPhiLook += 0.0005f * dy;
-
-        if (g_CameraPhiLook > phimax)
-            g_CameraPhiLook = phimax;
-
-        if (g_CameraPhiLook < phimin)
-            g_CameraPhiLook = phimin;
-    }
+    camera.updateMouse(dx, dy);
 
     // Atualizamos as variáveis globais para armazenar a posição atual do
     // cursor como sendo a última posição conhecida do cursor.
@@ -106,17 +77,9 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos){
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset){
     // Atualizamos a distância da câmera para a origem utilizando a
     // movimentação da "rodinha", simulando um ZOOM.
-    g_CameraDistance -= 0.1f * yoffset;
+    float dy = 0.1f * yoffset;
 
-    // Uma câmera look-at nunca pode estar exatamente "em cima" do ponto para
-    // onde ela está olhando, pois isto gera problemas de divisão por zero na
-    // definição do sistema de coordenadas da câmera. Isto é, a variável abaixo
-    // nunca pode ser zero. Versões anteriores deste código possuíam este bug,
-    // o qual foi detectado pelo aluno Vinicius Fraga (2017/2).
-    const float verysmallnumber = std::numeric_limits<float>::epsilon();
-
-    if (g_CameraDistance < verysmallnumber)
-        g_CameraDistance = verysmallnumber;
+    camera.updateDistance(dy);
 }
 
 // Definição da função que será chamada sempre que o usuário pressionar alguma
@@ -126,24 +89,15 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
 
-    g_Camera = 0;
+    camera.setUpdatingPosition(none);
 
     // Se o usuário apertar a tecla P, utilizamos projeção perspectiva.
-    if (key == GLFW_KEY_P && action == GLFW_PRESS){
-        cameraModeChanged = true;
-        isFreeCamera = true;
-    }
+    if (key == GLFW_KEY_P && action == GLFW_PRESS) camera.changeMode();
 
-    // Se o usuário apertar a tecla O, utilizamos projeção ortográfica.
-    if (key == GLFW_KEY_O && action == GLFW_PRESS){
-        cameraModeChanged = true;
-        isFreeCamera = false;
-    }
-
-    if (key == GLFW_KEY_W && (action == GLFW_PRESS || action == GLFW_REPEAT)) g_Camera = 1;
-    else if (key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT)) g_Camera = 2;
-    else if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT)) g_Camera = 3;
-    else if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT)) g_Camera = 4;
+    if (key == GLFW_KEY_W && (action == GLFW_PRESS || action == GLFW_REPEAT)) camera.setUpdatingPosition(up);
+    else if (key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT)) camera.setUpdatingPosition(down);
+    else if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT)) camera.setUpdatingPosition(left);
+    else if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT)) camera.setUpdatingPosition(right);
 }
 
 // Definimos o callback para impressão de erros da GLFW no terminal

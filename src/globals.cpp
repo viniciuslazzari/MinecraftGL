@@ -8,28 +8,18 @@ std::map<std::string, SceneObject> g_VirtualScene;
 
 bool windowIsFocused = false;
 
-// Razão de proporção da janela (largura/altura). Veja função FramebufferSizeCallback().
-float g_ScreenRatio = 1.0f;
-
-int g_Camera = 0.0;
-float g_CameraSpeed = 0.1f;
-
 // "g_LeftMouseButtonPressed = true" se o usuário está com o botão esquerdo do mouse
 // pressionado no momento atual. Veja função MouseButtonCallback().
 bool g_LeftMouseButtonPressed = false;
 
-// Variáveis que definem a câmera em coordenadas esféricas, controladas pelo
-// usuário através do mouse (veja função CursorPosCallback()). A posição
-// efetiva da câmera é calculada dentro da função main(), dentro do loop de
-// renderização.
-float g_CameraThetaFree = 0.0f; // Ângulo no plano ZX em relação ao eixo Z
-float g_CameraPhiFree = 0.0f;   // Ângulo em relação ao eixo Y
-float g_CameraThetaLook = 0.0f; // Ângulo no plano ZX em relação ao eixo Z
-float g_CameraPhiLook = 0.0f;   // Ângulo em relação ao eixo Y
-float g_CameraDistance = 2.5f; // Distância da câmera para a origem
-
 double g_LastCursorPosX = 0.0f;
 double g_LastCursorPosY = 0.0f;
 
-bool isFreeCamera = true;
-bool cameraModeChanged = true;
+double deltaTime = 0.0f;
+
+glm::vec4 camera_position_free = glm::vec4(-1.0f, 1.0f, 5.0f, 1.0f);
+glm::vec4 camera_position_look = glm::vec4(0.0f, 0.0f, 2.5f, 1.0f);
+glm::vec4 camera_view_free = glm::vec4(0.0f, 0.0f, 2.5f, 1.0f);
+glm::vec4 camera_view_look = glm::vec4(0.0f, 0.0f, 2.5f, 1.0f);
+
+Camera camera = Camera(2.0f, 2.5f, camera_position_free, camera_position_look, camera_view_free, camera_view_look);

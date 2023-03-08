@@ -1,4 +1,5 @@
 #include <string>
+#include <chrono>
 
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
@@ -12,6 +13,7 @@
 #include "game.hpp"
 #include "globals.hpp"
 #include "callbacks.hpp"
+#include "camera.hpp"
 #include "shaders_provider.hpp"
 #include "window_provider.hpp"
 #include "obj_loader.hpp"
@@ -59,18 +61,14 @@ int game(){
     glm::mat4 the_model;
     glm::mat4 the_view;
 
-    glm::vec4 camera_up_vector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f); 
-    glm::vec4 camera_position_c_free = glm::vec4(-1.0f, 1.0f, 5.0f, 1.0f);
-    glm::vec4 camera_view_vector;
+    std::chrono::time_point<std::chrono::high_resolution_clock> elapsedTime, timeSinceLastFrame;
 
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window)){
-        // Definimos a cor do "fundo" do framebuffer como branco.  Tal cor é
-        // definida como coeficientes RGBA: Red, Green, Blue, Alpha; isto é:
-        // Vermelho, Verde, Azul, Alpha (valor de transparência).
-        // Conversaremos sobre sistemas de cores nas aulas de Modelos de Iluminação.
-        //
-        //           R     G     B     A
+        elapsedTime = std::chrono::high_resolution_clock::now();
+        deltaTime = std::chrono::duration<double, std::milli>(elapsedTime - timeSinceLastFrame).count() / 1000;
+        timeSinceLastFrame = elapsedTime;
+
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
         // "Pintamos" todos os pixels do framebuffer com a cor definida acima,
@@ -86,69 +84,8 @@ int game(){
         // comentários detalhados dentro da definição de BuildTriangles().
         glBindVertexArray(vertex_array_object_id);
 
-        // Computamos a posição da câmera utilizando coordenadas esféricas.  As
-        // variáveis g_CameraDistance, g_CameraPhi, e g_CameraTheta são
-        // controladas pelo mouse do usuário. Veja as funções CursorPosCallback()
-        // e ScrollCallback().
-        float r = g_CameraDistance;
-
-        float cameraTheta = 0.0f;
-        float cameraPhi = 0.0f;
-
-        if (isFreeCamera) {
-            cameraTheta = g_CameraThetaFree;
-            cameraPhi = g_CameraPhiFree;
-        }
-        else{
-            cameraTheta = g_CameraThetaLook;
-            cameraPhi = g_CameraPhiLook;             
-        }
-
-        float y = -r * sin(cameraPhi) ;
-        float z = -r * cos(cameraPhi) * cos(cameraTheta);
-        float x = -r * cos(cameraPhi) * sin(cameraTheta);
-
-        glm::vec4 camera_position_c_look;
-
-        glm::mat4 view;
-
-        if (isFreeCamera){
-            camera_view_vector = glm::vec4(x, y, z, 0.0f); // Vetor "view", sentido para onde a câmera está virada
-            
-            glm::vec4 w = -camera_view_vector / norm(-camera_view_vector);
-            glm::vec4 u = crossproduct(camera_up_vector, w) / norm(crossproduct(camera_up_vector, w));
-
-            if (g_Camera == 1) camera_position_c_free += -w * g_CameraSpeed;
-            if (g_Camera == 2) camera_position_c_free += w * g_CameraSpeed;
-            if (g_Camera == 3) camera_position_c_free += -u * g_CameraSpeed;
-            if (g_Camera == 4) camera_position_c_free += u * g_CameraSpeed;
-
-            view = Matrix_Camera_View(camera_position_c_free, camera_view_vector, camera_up_vector);
-        }
-        else{
-            camera_position_c_look = glm::vec4(x, y, z, 1.0f); // Ponto "c", centro da câmera
-            glm::vec4 camera_lookat_l = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
-            camera_view_vector = camera_lookat_l - camera_position_c_look; // Vetor "view", sentido para onde a câmera está virada     
-
-            view = Matrix_Camera_View(camera_position_c_look, camera_view_vector, camera_up_vector);
-        }
-
-        // Agora computamos a matriz de Projeção.
-        glm::mat4 projection;
-        //glm::vec4 camera_view_vector;
-
-        // Note que, no sistema de coordenadas da câmera, os planos near e far
-        // estão no sentido negativo! Veja slides 176-204 do documento Aula_09_Projecoes.pdf.
-        float nearplane = -0.1f;  // Posição do "near plane"
-        float farplane  = -10.0f; // Posição do "far plane"
-
-        // Computamos a matriz "View" utilizando os parâmetros da câmera para
-        // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
-
-        // Projeção Perspectiva.
-        // Para definição do field of view (FOV), veja slides 205-215 do documento Aula_09_Projecoes.pdf.
-        float field_of_view = 3.141592 / 3.0f;
-        projection = Matrix_Perspective(field_of_view, g_ScreenRatio, nearplane, farplane);
+        glm::mat4 view = camera.getView();
+        glm::mat4 projection = camera.getProjection();
 
         // Enviamos as matrizes "view" e "projection" para a placa de vídeo
         // (GPU). Veja o arquivo "shader_vertex.glsl", onde estas são
