@@ -17,7 +17,7 @@ class Camera {
         float tethaLook = 0.0f;
 
         float near = -0.1f;
-        float far = -10.0f;
+        float far = -50.0f;
         const float fieldOfView = 3.141592 / 3.0f;
         float screenRatio = 1.0f;
 
