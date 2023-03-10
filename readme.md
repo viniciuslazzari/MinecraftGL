@@ -8,7 +8,7 @@ A minecraft implementation using C++ and OpenGL.
 - [ ] Geometric tranforms made by user
 - [X] Free camera
 - [X] Look-at camera
-- [ ] Object instances
+- [X] Object instances
 - [ ] Three types of intersection test
 - [ ] Difuse lighting model
 - [ ] Blinn-Phong lighting model
