@@ -20,7 +20,7 @@
 #include "perlin_noise.hpp"
 #include "obj_loader.hpp"
 
-#define MAP_SIZE 8
+#define MAP_SIZE 64
 
 GLuint BuildTriangles();
 
@@ -56,7 +56,7 @@ int game(){
 
     PerlinNoise pn = PerlinNoise(MAP_SIZE, MAP_SIZE);
 
-    vector<vector<float>> map = pn.generateNoise(8);
+    vector<vector<float>> map = pn.generateNoise(6);
 
     // Habilitamos o Z-buffer. Veja slides 104-116 do documento Aula_09_Projecoes.pdf.
     glEnable(GL_DEPTH_TEST);
@@ -66,6 +66,9 @@ int game(){
 
     Texture grassTopTexture = Texture("assets/grass_top.jpg", GL_TEXTURE_2D);
     grassTopTexture.load();
+
+    Texture dirtTexture = Texture("assets/dirt.png", GL_TEXTURE_2D);
+    dirtTexture.load();
 
     std::chrono::time_point<std::chrono::high_resolution_clock> elapsedTime, timeSinceLastFrame;
 
@@ -100,22 +103,22 @@ int game(){
 
         int init = -MAP_SIZE / 2;
 
+        glm::mat4 model;
+
         for (int i = 0; i < MAP_SIZE; ++i){
             for(int j = 0; j < MAP_SIZE; j++){
-                glm::mat4 model;
-
-                model = Matrix_Translate(init + i * 1.0f, map[i][j] - 30, init + j * 1.0f);
+                model = Matrix_Translate(init + i * 1.0f, map[i][j] - 20, init + j * 1.0f);
 
                 glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
 
                 grassSideTexture.bind(GL_TEXTURE0);
 
-                // glDrawElements(
-                //     g_VirtualScene["cube_sides"].renderingMode,
-                //     g_VirtualScene["cube_sides"].numIndexes,
-                //     GL_UNSIGNED_INT,
-                //     (void*)g_VirtualScene["cube_sides"].firstIndex
-                // );
+                glDrawElements(
+                    g_VirtualScene["cube_sides"].renderingMode,
+                    g_VirtualScene["cube_sides"].numIndexes,
+                    GL_UNSIGNED_INT,
+                    (void*) g_VirtualScene["cube_sides"].firstIndex
+                );
 
                 grassTopTexture.bind(GL_TEXTURE0);
 
@@ -123,14 +126,23 @@ int game(){
                     g_VirtualScene["cube_top"].renderingMode,
                     g_VirtualScene["cube_top"].numIndexes,
                     GL_UNSIGNED_INT,
-                    (void*)g_VirtualScene["cube_top"].firstIndex
+                    (void*) g_VirtualScene["cube_top"].firstIndex
+                );
+
+                dirtTexture.bind(GL_TEXTURE0);
+
+                glDrawElements(
+                    g_VirtualScene["cube_base"].renderingMode,
+                    g_VirtualScene["cube_base"].numIndexes,
+                    GL_UNSIGNED_INT,
+                    (void*) g_VirtualScene["cube_base"].firstIndex
                 );
             }
         }
 
         #define COW 4
 
-        glm::mat4 model = Matrix_Translate(-2.0f, 0.0f, -2.0f);
+        model = Matrix_Translate(-2.0f, 0.0f, -2.0f);
         glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(object_id_uniform, COW);
         cowModel.DrawVirtualObject("the_cow");
@@ -200,6 +212,11 @@ GLuint BuildTriangles(){
         -0.5f,  0.5f,  0.5f, 1.0f, // posição do vértice 17
          0.5f,  0.5f,  0.5f, 1.0f, // posição do vértice 18
          0.5f,  0.5f, -0.5f, 1.0f, // posição do vértice 19
+
+        -0.5f, -0.5f, -0.5f, 1.0f, // posição do vértice 16
+        -0.5f, -0.5f,  0.5f, 1.0f, // posição do vértice 17
+         0.5f, -0.5f,  0.5f, 1.0f, // posição do vértice 18
+         0.5f, -0.5f, -0.5f, 1.0f, // posição do vértice 19
     };
 
     // Criamos o identificador (ID) de um Vertex Buffer Object (VBO).  Um VBO é
@@ -276,6 +293,7 @@ GLuint BuildTriangles(){
         0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // back face
         0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // left face
         0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // top face
+        0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // bottom face
     };
 
     GLuint VBO_texture_coefficients_id;
@@ -306,7 +324,9 @@ GLuint BuildTriangles(){
         12, 13, 14,
         12, 14, 15,
         16, 17, 18,
-        16, 18, 19
+        16, 18, 19,
+        20, 21, 22,
+        20, 22, 23
     };
 
     // Criamos um primeiro objeto virtual (SceneObject) que se refere às faces
@@ -324,12 +344,24 @@ GLuint BuildTriangles(){
     // coloridas do cubo.
     SceneObject cube_top;
     cube_top.name = "Topo do cubo";
-    cube_top.firstIndex = 24; // Primeiro índice está em indices[0]
+    cube_top.firstIndex = 24 * sizeof(unsigned int); // Primeiro índice está em indices[0]
     cube_top.numIndexes = 6; // Último índice está em indices[35]; total de 36 índices.
     cube_top.renderingMode = GL_TRIANGLES; // Índices correspondem ao tipo de rasterização GL_TRIANGLES.
 
     // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
     g_VirtualScene["cube_top"] = cube_top;
+
+    // Criamos um primeiro objeto virtual (SceneObject) que se refere às faces
+    // coloridas do cubo.
+    SceneObject cube_base;
+    cube_base.name = "Base do cubo";
+    cube_base.firstIndex = 30 * sizeof(unsigned int); // Primeiro índice está em indices[0]
+    cube_base.numIndexes = 6; // Último índice está em indices[35]; total de 36 índices.
+    cube_base.renderingMode = GL_TRIANGLES; // Índices correspondem ao tipo de rasterização GL_TRIANGLES.
+
+    // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
+    g_VirtualScene["cube_base"] = cube_base;
+
 
     // Criamos um buffer OpenGL para armazenar os índices acima
     GLuint indices_id;

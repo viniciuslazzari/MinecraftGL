@@ -36,7 +36,7 @@ vector<vector<float>> PerlinNoise::normalize(vector<vector<float>> grid){
 
     for(int i = 0; i < row; i++){
         for(int j = 0; j < col; j++){
-            grid[i][j] = round(grid[i][j] * 40);
+            grid[i][j] = round(grid[i][j] * 10);
         } 
     }
 

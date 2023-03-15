@@ -9,5 +9,6 @@ uniform sampler2D sampler;
 void main()
 {
     color = texture2D(sampler, texture_coords);
+    color.a = 1.0;
 } 
 
