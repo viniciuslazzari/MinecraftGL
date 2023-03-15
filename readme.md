@@ -14,6 +14,6 @@ A minecraft implementation using C++ and OpenGL.
 - [ ] Blinn-Phong lighting model
 - [ ] Phong interpolation model
 - [ ] Gouraud interpolation model
-- [ ] Texture mapping
+- [X] Texture mapping
 - [ ] Cubic Bézier moving
 - [X] Time-base animations
