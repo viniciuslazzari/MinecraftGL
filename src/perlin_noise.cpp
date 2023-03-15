@@ -36,7 +36,7 @@ vector<vector<float>> PerlinNoise::normalize(vector<vector<float>> grid){
 
     for(int i = 0; i < row; i++){
         for(int j = 0; j < col; j++){
-            grid[i][j] = round(grid[i][j] * 20);
+            grid[i][j] = round(grid[i][j] * 40);
         } 
     }
 
@@ -65,9 +65,9 @@ vector<vector<float>> PerlinNoise::generateNoise(int octaves){
                 int octaveSpacing = row / 2;
 
                 int curPointX = (i / octaveSpacing) * octaveSpacing;
-                int nextPointX = (curPointX + octaveSpacing) % row;
-
                 int curPointY = (j / octaveSpacing) * octaveSpacing;
+                
+                int nextPointX = (curPointX + octaveSpacing) % row;
                 int nextPointY = (curPointY + octaveSpacing) % row;
 
                 float octaveIndexX = (float) (i - curPointX) / (float) octaveSpacing;

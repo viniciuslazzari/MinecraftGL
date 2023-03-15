@@ -16,14 +16,13 @@
 #include "camera.hpp"
 #include "shaders_provider.hpp"
 #include "window_provider.hpp"
+#include "texture.hpp"
 #include "perlin_noise.hpp"
 #include "obj_loader.hpp"
 
-#define MAP_SIZE 128
+#define MAP_SIZE 8
 
-// Declaração de várias funções utilizadas em main().  Essas estão definidas
-// logo após a definição de main() neste arquivo.
-GLuint BuildTriangles(); // Constrói triângulos para renderização
+GLuint BuildTriangles();
 
 int game(){
     WindowProvider windowProvider = WindowProvider(800, 800, "Teste");
@@ -53,14 +52,20 @@ int game(){
     GLint view_uniform = glGetUniformLocation(programId, "view"); // Variável da matriz "view" em shader_vertex.glsl
     GLint projection_uniform = glGetUniformLocation(programId, "projection"); // Variável da matriz "projection" em shader_vertex.glsl
     GLint object_id_uniform = glGetUniformLocation(programId, "object_id"); // Variável booleana em shader_vertex.glsl
-    GLint render_as_black_uniform = glGetUniformLocation(programId, "render_as_black"); // Variável booleana em shader_vertex.glsl
+    GLint sampler_uniform = glGetUniformLocation(programId, "sampler"); 
 
     PerlinNoise pn = PerlinNoise(MAP_SIZE, MAP_SIZE);
 
-    vector<vector<float>> map = pn.generateNoise(1);
+    vector<vector<float>> map = pn.generateNoise(8);
 
     // Habilitamos o Z-buffer. Veja slides 104-116 do documento Aula_09_Projecoes.pdf.
     glEnable(GL_DEPTH_TEST);
+
+    Texture grassSideTexture = Texture("assets/grass_side.png", GL_TEXTURE_2D);
+    grassSideTexture.load();
+
+    Texture grassTopTexture = Texture("assets/grass_top.jpg", GL_TEXTURE_2D);
+    grassTopTexture.load();
 
     std::chrono::time_point<std::chrono::high_resolution_clock> elapsedTime, timeSinceLastFrame;
 
@@ -88,34 +93,40 @@ int game(){
         glm::mat4 view = camera.getView();
         glm::mat4 projection = camera.getProjection();
 
-        // Enviamos as matrizes "view" e "projection" para a placa de vídeo
-        // (GPU). Veja o arquivo "shader_vertex.glsl", onde estas são
-        // efetivamente aplicadas em todos os pontos.
         glUniformMatrix4fv(view_uniform, 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(projection_uniform, 1, GL_FALSE, glm::value_ptr(projection));
 
+        glUniform1i(sampler_uniform, 0);
+
         int init = -MAP_SIZE / 2;
 
-        // Vamos desenhar 3 instâncias (cópias) do cubo
         for (int i = 0; i < MAP_SIZE; ++i){
             for(int j = 0; j < MAP_SIZE; j++){
                 glm::mat4 model;
 
-                model = Matrix_Translate(init + i * 1.0f, map[i][j] - 10, init + j * 1.0f);
+                model = Matrix_Translate(init + i * 1.0f, map[i][j] - 30, init + j * 1.0f);
 
                 glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-                glUniform1i(render_as_black_uniform, false);
+
+                grassSideTexture.bind(GL_TEXTURE0);
+
+                // glDrawElements(
+                //     g_VirtualScene["cube_sides"].renderingMode,
+                //     g_VirtualScene["cube_sides"].numIndexes,
+                //     GL_UNSIGNED_INT,
+                //     (void*)g_VirtualScene["cube_sides"].firstIndex
+                // );
+
+                grassTopTexture.bind(GL_TEXTURE0);
 
                 glDrawElements(
-                    g_VirtualScene["cube_faces"].renderingMode,
-                    g_VirtualScene["cube_faces"].numIndexes,
+                    g_VirtualScene["cube_top"].renderingMode,
+                    g_VirtualScene["cube_top"].numIndexes,
                     GL_UNSIGNED_INT,
-                    (void*)g_VirtualScene["cube_faces"].firstIndex
+                    (void*)g_VirtualScene["cube_top"].firstIndex
                 );
             }
         }
-
-        glUniform1i(render_as_black_uniform, false);
 
         #define COW 4
 
@@ -160,28 +171,35 @@ GLuint BuildTriangles(){
     // Este vetor "model_coefficients" define a GEOMETRIA (veja slides 103-110 do documento Aula_04_Modelagem_Geometrica_3D.pdf).
     //
     GLfloat model_coefficients[] = {
-    // Vértices de um cubo
-    //    X      Y     Z     W
+        // front face
         -0.5f,  0.5f,  0.5f, 1.0f, // posição do vértice 0
         -0.5f, -0.5f,  0.5f, 1.0f, // posição do vértice 1
          0.5f, -0.5f,  0.5f, 1.0f, // posição do vértice 2
          0.5f,  0.5f,  0.5f, 1.0f, // posição do vértice 3
-        -0.5f,  0.5f, -0.5f, 1.0f, // posição do vértice 4
-        -0.5f, -0.5f, -0.5f, 1.0f, // posição do vértice 5
+
+        // right face
+         0.5f,  0.5f,  0.5f, 1.0f, // posição do vértice 4 (3)
+         0.5f, -0.5f,  0.5f, 1.0f, // posição do vértice 5 (2)
          0.5f, -0.5f, -0.5f, 1.0f, // posição do vértice 6
          0.5f,  0.5f, -0.5f, 1.0f, // posição do vértice 7
-    // Vértices para desenhar o eixo X
-    //    X      Y     Z     W
-         0.0f,  0.0f,  0.0f, 1.0f, // posição do vértice 8
-         1.0f,  0.0f,  0.0f, 1.0f, // posição do vértice 9
-    // Vértices para desenhar o eixo Y
-    //    X      Y     Z     W
-         0.0f,  0.0f,  0.0f, 1.0f, // posição do vértice 10
-         0.0f,  1.0f,  0.0f, 1.0f, // posição do vértice 11
-    // Vértices para desenhar o eixo Z
-    //    X      Y     Z     W
-         0.0f,  0.0f,  0.0f, 1.0f, // posição do vértice 12
-         0.0f,  0.0f,  1.0f, 1.0f, // posição do vértice 13
+
+        // back face
+         0.5f,  0.5f, -0.5f, 1.0f, // posição do vértice 8 (7)
+         0.5f, -0.5f, -0.5f, 1.0f, // posição do vértice 9 (6)
+        -0.5f, -0.5f, -0.5f, 1.0f, // posição do vértice 10
+        -0.5f,  0.5f, -0.5f, 1.0f, // posição do vértice 11
+
+        // left face
+        -0.5f,  0.5f, -0.5f, 1.0f, // posição do vértice 12 (11)
+        -0.5f, -0.5f, -0.5f, 1.0f, // posição do vértice 13 (10)
+        -0.5f, -0.5f,  0.5f, 1.0f, // posição do vértice 14 (1)
+        -0.5f,  0.5f,  0.5f, 1.0f, // posição do vértice 15 (0)
+
+        // top face
+        -0.5f,  0.5f, -0.5f, 1.0f, // posição do vértice 16
+        -0.5f,  0.5f,  0.5f, 1.0f, // posição do vértice 17
+         0.5f,  0.5f,  0.5f, 1.0f, // posição do vértice 18
+         0.5f,  0.5f, -0.5f, 1.0f, // posição do vértice 19
     };
 
     // Criamos o identificador (ID) de um Vertex Buffer Object (VBO).  Um VBO é
@@ -240,7 +258,7 @@ GLuint BuildTriangles(){
     // está dentro do VAO "ligado" acima por glBindVertexArray().
     // Veja https://www.khronos.org/opengl/wiki/Vertex_Specification#Vertex_Buffer_Object
     GLuint location = 0; // "(location = 0)" em "shader_vertex.glsl"
-    GLint  number_of_dimensions = 4; // vec4 em "shader_vertex.glsl"
+    GLint number_of_dimensions = 4; // vec4 em "shader_vertex.glsl"
     glVertexAttribPointer(location, number_of_dimensions, GL_FLOAT, GL_FALSE, 0, 0);
 
     // "Ativamos" os atributos. Informamos que os atributos com índice de local
@@ -252,39 +270,21 @@ GLuint BuildTriangles(){
     // alterar o mesmo. Isso evita bugs.
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    // Agora repetimos todos os passos acima para atribuir um novo atributo a
-    // cada vértice: uma cor (veja slides 109-112 do documento Aula_03_Rendering_Pipeline_Grafico.pdf e slide 111 do documento Aula_04_Modelagem_Geometrica_3D.pdf).
-    // Tal cor é definida como coeficientes RGBA: Red, Green, Blue, Alpha;
-    // isto é: Vermelho, Verde, Azul, Alpha (valor de transparência).
-    // Conversaremos sobre sistemas de cores nas aulas de Modelos de Iluminação.
-    GLfloat color_coefficients[] = {
-    // Cores dos vértices do cubo
-    //  R     G     B     A
-        1.0f, 0.5f, 0.0f, 1.0f, // cor do vértice 0
-        1.0f, 0.5f, 0.0f, 1.0f, // cor do vértice 1
-        0.0f, 0.5f, 1.0f, 1.0f, // cor do vértice 2
-        0.0f, 0.5f, 1.0f, 1.0f, // cor do vértice 3
-        1.0f, 0.5f, 0.0f, 1.0f, // cor do vértice 4
-        1.0f, 0.5f, 0.0f, 1.0f, // cor do vértice 5
-        0.0f, 0.5f, 1.0f, 1.0f, // cor do vértice 6
-        0.0f, 0.5f, 1.0f, 1.0f, // cor do vértice 7
-    // Cores para desenhar o eixo X
-        1.0f, 0.0f, 0.0f, 1.0f, // cor do vértice 8
-        1.0f, 0.0f, 0.0f, 1.0f, // cor do vértice 9
-    // Cores para desenhar o eixo Y
-        0.0f, 1.0f, 0.0f, 1.0f, // cor do vértice 10
-        0.0f, 1.0f, 0.0f, 1.0f, // cor do vértice 11
-    // Cores para desenhar o eixo Z
-        0.0f, 0.0f, 1.0f, 1.0f, // cor do vértice 12
-        0.0f, 0.0f, 1.0f, 1.0f, // cor do vértice 13
+    GLfloat texture_coefficients[] = {
+        0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // front face
+        0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // right face
+        0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // back face
+        0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // left face
+        0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // top face
     };
-    GLuint VBO_color_coefficients_id;
-    glGenBuffers(1, &VBO_color_coefficients_id);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_color_coefficients_id);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color_coefficients), NULL, GL_STATIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(color_coefficients), color_coefficients);
+
+    GLuint VBO_texture_coefficients_id;
+    glGenBuffers(1, &VBO_texture_coefficients_id);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_texture_coefficients_id);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(texture_coefficients), NULL, GL_STATIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(texture_coefficients), texture_coefficients);
     location = 1; // "(location = 1)" em "shader_vertex.glsl"
-    number_of_dimensions = 4; // vec4 em "shader_vertex.glsl"
+    number_of_dimensions = 2; // vec2 em "shader_vertex.glsl"
     glVertexAttribPointer(location, number_of_dimensions, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(location);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -297,72 +297,39 @@ GLuint BuildTriangles(){
     // Este vetor "indices" define a TOPOLOGIA (veja slides 103-110 do documento Aula_04_Modelagem_Geometrica_3D.pdf).
     //
     GLuint indices[] = {
-    // Definimos os índices dos vértices que definem as FACES de um cubo
-    // através de 12 triângulos que serão desenhados com o modo de renderização
-    // GL_TRIANGLES.
         0, 1, 2, // triângulo 1 
-        7, 6, 5, // triângulo 2 
-        3, 2, 6, // triângulo 3 
-        4, 0, 3, // triângulo 4 
-        4, 5, 1, // triângulo 5 
-        1, 5, 6, // triângulo 6 
-        0, 2, 3, // triângulo 7 
-        7, 5, 4, // triângulo 8 
-        3, 6, 7, // triângulo 9 
-        4, 3, 7, // triângulo 10
-        4, 1, 0, // triângulo 11
-        1, 6, 2, // triângulo 12
-    // Definimos os índices dos vértices que definem as ARESTAS de um cubo
-    // através de 12 linhas que serão desenhadas com o modo de renderização
-    // GL_LINES.
-        0, 1, // linha 1 
-        1, 2, // linha 2 
-        2, 3, // linha 3 
-        3, 0, // linha 4 
-        0, 4, // linha 5 
-        4, 7, // linha 6 
-        7, 6, // linha 7 
-        6, 2, // linha 8 
-        6, 5, // linha 9 
-        5, 4, // linha 10
-        5, 1, // linha 11
-        7, 3, // linha 12
-    // Definimos os índices dos vértices que definem as linhas dos eixos X, Y,
-    // Z, que serão desenhados com o modo GL_LINES.
-        8 , 9 , // linha 1
-        10, 11, // linha 2
-        12, 13  // linha 3
+        0, 2, 3, // triângulo 2
+        4, 5, 6,
+        4, 6, 7,
+        8, 9, 10,
+        8, 10, 11,
+        12, 13, 14,
+        12, 14, 15,
+        16, 17, 18,
+        16, 18, 19
     };
 
     // Criamos um primeiro objeto virtual (SceneObject) que se refere às faces
     // coloridas do cubo.
-    SceneObject cube_faces;
-    cube_faces.name           = "Cubo (faces coloridas)";
-    cube_faces.firstIndex    = 0; // Primeiro índice está em indices[0]
-    cube_faces.numIndexes    = 36;       // Último índice está em indices[35]; total de 36 índices.
-    cube_faces.renderingMode = GL_TRIANGLES; // Índices correspondem ao tipo de rasterização GL_TRIANGLES.
+    SceneObject cube_sides;
+    cube_sides.name = "Lados do cubo";
+    cube_sides.firstIndex = 0; // Primeiro índice está em indices[0]
+    cube_sides.numIndexes = 24; // Último índice está em indices[35]; total de 36 índices.
+    cube_sides.renderingMode = GL_TRIANGLES; // Índices correspondem ao tipo de rasterização GL_TRIANGLES.
 
     // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
-    g_VirtualScene["cube_faces"] = cube_faces;
+    g_VirtualScene["cube_sides"] = cube_sides;
 
-    // Criamos um segundo objeto virtual (SceneObject) que se refere às arestas
-    // pretas do cubo.
-    SceneObject cube_edges;
-    cube_edges.name           = "Cubo (arestas pretas)";
-    cube_edges.firstIndex    = 36 * sizeof(GLuint); // Primeiro índice está em indices[36]
-    cube_edges.numIndexes    = 24; // Último índice está em indices[59]; total de 24 índices.
-    cube_edges.renderingMode = GL_LINES; // Índices correspondem ao tipo de rasterização GL_LINES.
+    // Criamos um primeiro objeto virtual (SceneObject) que se refere às faces
+    // coloridas do cubo.
+    SceneObject cube_top;
+    cube_top.name = "Topo do cubo";
+    cube_top.firstIndex = 24; // Primeiro índice está em indices[0]
+    cube_top.numIndexes = 6; // Último índice está em indices[35]; total de 36 índices.
+    cube_top.renderingMode = GL_TRIANGLES; // Índices correspondem ao tipo de rasterização GL_TRIANGLES.
 
     // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
-    g_VirtualScene["cube_edges"] = cube_edges;
-
-    // Criamos um terceiro objeto virtual (SceneObject) que se refere aos eixos XYZ.
-    SceneObject axes;
-    axes.name           = "Eixos XYZ";
-    axes.firstIndex    = 60 * sizeof(GLuint); // Primeiro índice está em indices[60]
-    axes.numIndexes    = 6; // Último índice está em indices[65]; total de 6 índices.
-    axes.renderingMode = GL_LINES; // Índices correspondem ao tipo de rasterização GL_LINES.
-    g_VirtualScene["axes"] = axes;
+    g_VirtualScene["cube_top"] = cube_top;
 
     // Criamos um buffer OpenGL para armazenar os índices acima
     GLuint indices_id;
