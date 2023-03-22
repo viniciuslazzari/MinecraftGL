@@ -111,7 +111,7 @@ int game(){
             for(int j = 0; j < MAP_SIZE; j++){
                 model = Matrix_Translate(init + i * 1.0f, map[i][j] - 20, init + j * 1.0f);
 
-                mapData[i][j] = model[3][1];
+                mapData[i][j] = model[3];
 
                 glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
 

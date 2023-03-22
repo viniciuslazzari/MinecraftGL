@@ -4,6 +4,6 @@
 #include <glm/glm.hpp>
 #include "globals.hpp"
 
-void collideCameraWithMap(glm::vec4& position, float mapData[64][64]);
+void collideCameraWithMap(glm::vec4& position, glm::vec4 mapData[64][64]);
 
 #endif 

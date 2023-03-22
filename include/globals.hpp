@@ -60,6 +60,6 @@ extern double deltaTime;
 
 extern Camera camera;
 
-extern float mapData[MAP_SIZE][MAP_SIZE];
+extern glm::vec4 mapData[MAP_SIZE][MAP_SIZE];
 
 #endif
