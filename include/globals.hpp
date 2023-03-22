@@ -9,6 +9,7 @@
 
 #include "camera.hpp"
 
+#define MAP_SIZE 64
 // Definimos uma estrutura que armazenará dados necessários para renderizar
 // cada objeto da cena virtual.
 class SceneObject {
@@ -58,5 +59,7 @@ extern bool isFreeCamera;
 extern double deltaTime;
 
 extern Camera camera;
+
+extern float mapData[MAP_SIZE][MAP_SIZE];
 
 #endif

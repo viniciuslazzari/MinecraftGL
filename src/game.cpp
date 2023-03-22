@@ -1,11 +1,14 @@
+#include <cstdio>
 #include <string>
 #include <chrono>
+#include <iostream>
 
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp> // for glm::to_string
 
 #include "std/utils.h"
 #include "std/matrices.h"
@@ -20,7 +23,6 @@
 #include "perlin_noise.hpp"
 #include "obj_loader.hpp"
 
-#define MAP_SIZE 64
 
 GLuint BuildTriangles();
 
@@ -108,6 +110,8 @@ int game(){
         for (int i = 0; i < MAP_SIZE; ++i){
             for(int j = 0; j < MAP_SIZE; j++){
                 model = Matrix_Translate(init + i * 1.0f, map[i][j] - 20, init + j * 1.0f);
+
+                mapData[i][j] = model[3][1];
 
                 glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
 

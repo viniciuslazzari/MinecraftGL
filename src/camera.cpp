@@ -1,5 +1,6 @@
 #include "camera.hpp"
 #include "globals.hpp"
+#include "collisions.hpp"
 #include "std/matrices.h"
 
 const float phimax = 3.141592f / 2;
@@ -33,6 +34,8 @@ void Camera::move(){
         case(right): this->positionFree += u * (float)(deltaTime * this->speed); break;
         default: break;
     }
+
+    collideCameraWithMap(this->positionFree, mapData);
 }
 
 float Camera::returnX(){
