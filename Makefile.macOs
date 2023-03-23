@@ -8,7 +8,7 @@ INCLUDES_FOLDER = include
 
 PROGRAM_NAME = MineGL
 TARGETS = main.cpp $(wildcard $(SRC_FOLDER)/*.cpp) $(wildcard $(SRC_FOLDER)/lib/*.c) 
-LIBS = libglfw3.a
+LIBS = libglfw.3.3.dylib
 LIBS_FLAGS =-lglfw -lm -ldl -lpthread
 BIN_PATH = $(BUILD_FOLDER)/$(PROGRAM_NAME)
 
