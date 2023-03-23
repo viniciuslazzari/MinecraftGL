@@ -4,7 +4,8 @@
 // map block collision
 #define DISTANCE 2.0f
 
-void collideCameraWithMap(glm::vec4 &position, glm::vec4 mapData[64][64]) {
+void collideCameraWithMap(glm::vec4 &position,
+                          glm::vec4 mapData[MAP_SIZE][MAP_SIZE]) {
   int max_coord = MAP_SIZE / 2;
   int x = static_cast<int>(floor(position.x)) + max_coord;
   int z = static_cast<int>(floor(position.z)) + max_coord;
@@ -50,7 +51,7 @@ void collideCameraWithCow(glm::vec4 &cameraPosition, glm::vec3 &cowPosition) {
 
   // posicao da vaca e estimativa do bounding box
   glm::vec3 cowPos = glm::vec3(cowPosition);
-  glm::vec3 cowSize = glm::vec3(2.0f, 2.0f, 2.0f);
+  glm::vec3 cowSize = glm::vec3(2.0f, 1.5f, 2.0f);
 
   // ve se a camera entra na bounding box da vaca
   if (cameraPos.x > cowPos.x - cowSize.x / 2 &&
@@ -66,4 +67,15 @@ void collideCameraWithCow(glm::vec4 &cameraPosition, glm::vec3 &cowPosition) {
     // se nao detectar, atualiza a ultima posicao
     previousCameraPosition = cameraPosition;
   }
+}
+
+bool collideCowWithMap(glm::vec3 cowPosition, glm::vec4 mapData[64][64]) {
+  int x = (int)floor(cowPosition.x);
+  int z = (int)floor(cowPosition.z);
+
+  if (cowPosition.y <= mapData[x + MAP_SIZE / 2][z + MAP_SIZE / 2].y + 1.5) {
+    return true;
+  }
+
+  return false;
 }
