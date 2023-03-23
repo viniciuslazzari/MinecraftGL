@@ -5,6 +5,6 @@
 #include "globals.hpp"
 
 void collideCameraWithMap(glm::vec4& position, glm::vec4 mapData[64][64]);
-void collideCameraWithCow(glm::vec4 &cameraPosition);
+void collideCameraWithCow(glm::vec4 &cameraPosition, glm::vec3 &cowPosition);
 
 #endif 

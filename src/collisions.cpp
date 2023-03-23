@@ -44,12 +44,12 @@ void collideCameraWithMap(glm::vec4 &position, glm::vec4 mapData[64][64]) {
 
 // bounding box approx collision
 glm::vec4 previousCameraPosition;
-void collideCameraWithCow(glm::vec4 &cameraPosition) {
+void collideCameraWithCow(glm::vec4 &cameraPosition, glm::vec3 &cowPosition) {
   // posicao da camera interna da funcao
   glm::vec3 cameraPos = glm::vec3(cameraPosition);
 
   // posicao da vaca e estimativa do bounding box
-  glm::vec3 cowPos = glm::vec3(-2.0f, 0.0f, -2.0f);
+  glm::vec3 cowPos = glm::vec3(cowPosition);
   glm::vec3 cowSize = glm::vec3(2.0f, 2.0f, 2.0f);
 
   // ve se a camera entra na bounding box da vaca

@@ -6,7 +6,8 @@
 
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
-
+#include <glm/glm.hpp>  
+                       
 #include "camera.hpp"
 
 #define MAP_SIZE 64
@@ -61,5 +62,6 @@ extern double deltaTime;
 extern Camera camera;
 
 extern glm::vec4 mapData[MAP_SIZE][MAP_SIZE];
+extern glm::vec3 cowPosition;
 
 #endif

@@ -145,8 +145,22 @@ int game(){
         }
 
         #define COW 4
+// Define the initial position and the speed of the model
+glm::vec3 initialPosition = glm::vec3(-2.0f, 0.0f, -2.0f);
+float speed = 5.0f;
 
-        model = Matrix_Translate(-2.0f, 0.0f, -2.0f);
+// Define the elapsed time since the start of the program
+float time = glfwGetTime();
+
+// Calculate the new position of the model based on the elapsed time
+cowPosition = initialPosition + glm::vec3(
+        0.0f,
+    -speed*time, // motion along the x-axis
+    0.0f
+);
+
+// Update the model transformation matrix
+ model = glm::translate(glm::mat4(1.0f), cowPosition);
         glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(object_id_uniform, COW);
         cowModel.DrawVirtualObject("the_cow");

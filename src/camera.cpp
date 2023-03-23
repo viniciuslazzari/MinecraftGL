@@ -36,7 +36,7 @@ void Camera::move(){
     }
 
     collideCameraWithMap(this->positionFree, mapData);
-    collideCameraWithCow(this->positionFree);
+    collideCameraWithCow(this->positionFree, cowPosition);
 }
 
 float Camera::returnX(){
