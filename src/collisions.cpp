@@ -2,8 +2,9 @@
 #include "globals.hpp"
 
 // map block collision
-#define DISTANCE 2.0f
+#define DISTANCE 2.0f 
 
+// point-cube collision
 void collideCameraWithMap(glm::vec4 &position,
                           glm::vec4 mapData[MAP_SIZE][MAP_SIZE]) {
   int max_coord = MAP_SIZE / 2;
@@ -43,7 +44,7 @@ void collideCameraWithMap(glm::vec4 &position,
   }
 }
 
-// bounding box approx collision
+// point-sphere collision
 glm::vec4 previousCameraPosition;
 void collideCameraWithCow(glm::vec4 &cameraPosition, glm::vec3 &cowPosition) {
   // posicao da camera interna da funcao
@@ -51,24 +52,19 @@ void collideCameraWithCow(glm::vec4 &cameraPosition, glm::vec3 &cowPosition) {
 
   // posicao da vaca e estimativa do bounding box
   glm::vec3 cowPos = glm::vec3(cowPosition);
-  glm::vec3 cowSize = glm::vec3(2.0f, 1.5f, 2.0f);
+  float cowRadius = 1.5f;
 
-  // ve se a camera entra na bounding box da vaca
-  if (cameraPos.x > cowPos.x - cowSize.x / 2 &&
-      cameraPos.x < cowPos.x + cowSize.x / 2 &&
-      cameraPos.y > cowPos.y - cowSize.y / 2 &&
-      cameraPos.y < cowPos.y + cowSize.y / 2 &&
-      cameraPos.z > cowPos.z - cowSize.z / 2 &&
-      cameraPos.z < cowPos.z + cowSize.z / 2) {
-    // se entrar (colisao) retorna pra fora, fazendo efeito que colide com o
-    // modelo
+
+  // Checa colisao da vaca com esfera de hit
+  if (glm::distance(cameraPos, cowPos) < cowRadius) {
     cameraPosition = previousCameraPosition;
   } else {
-    // se nao detectar, atualiza a ultima posicao
     previousCameraPosition = cameraPosition;
   }
+
 }
 
+// cube-cube collision
 bool collideCowWithMap(glm::vec3 cowPosition, glm::vec4 mapData[64][64]) {
   int x = (int)floor(cowPosition.x);
   int z = (int)floor(cowPosition.z);
