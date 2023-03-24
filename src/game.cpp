@@ -167,8 +167,8 @@ int game() {
                                       0.0f);
     }
 
-    // Update the model transformation matrix
-    model = glm::translate(glm::mat4(1.0f), cowPosition);
+    model = Matrix_Translate(cowPosition.x, cowPosition.y, cowPosition.z);
+
     glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
     glUniform1i(object_id_uniform, COW);
     cowModel.DrawVirtualObject("the_cow");
