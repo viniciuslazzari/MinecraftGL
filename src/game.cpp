@@ -23,6 +23,9 @@
 #include "shaders_provider.hpp"
 #include "texture.hpp"
 #include "window_provider.hpp"
+#include "bezier.hpp"
+
+#define BEZIER_SPEED 0.1
 
 GLuint BuildTriangles();
 
@@ -47,6 +50,10 @@ int game() {
   ObjModel cowModel("assets/cow.obj");
   cowModel.ComputeNormals();
   cowModel.BuildTrianglesAndAddToVirtualScene();
+
+  ObjModel leafModel("assets/leaf.obj");
+  leafModel.ComputeNormals();
+  leafModel.BuildTrianglesAndAddToVirtualScene();
 
   // Construímos a representação de um triângulo
   GLuint vertex_array_object_id = BuildTriangles();
@@ -96,8 +103,12 @@ int game() {
   Texture dirtTexture = Texture("assets/dirt.png", GL_TEXTURE_2D);
   dirtTexture.load();
 
+  BezierCurve bezier = BezierCurve();
+
   std::chrono::time_point<std::chrono::high_resolution_clock> elapsedTime,
       timeSinceLastFrame;
+
+  float c = 0.0f;
 
   // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
   while (!glfwWindowShouldClose(window)) {
@@ -165,7 +176,7 @@ int game() {
       }
     }
 
-#define COW 4
+    #define COW 4
     // Define the initial position and the speed of the model
     glm::vec3 initialPosition = glm::vec3(-2.0f, 0.0f, -2.0f);
     float speed = 5.0f;
@@ -175,10 +186,7 @@ int game() {
 
     // Calculate the new position of the model based on the elapsed time
     if (!collideCowWithMap(cowPosition, mapData)) {
-      cowPosition =
-          initialPosition + glm::vec3(0.0f,
-                                      -speed * time, // motion along the x-axis
-                                      0.0f);
+      cowPosition = initialPosition + glm::vec3(0.0f, -speed * time, 0.0f);
     }
 
     model = Matrix_Translate(cowPosition.x, cowPosition.y, cowPosition.z) * Matrix_Rotate_Y(cowRotate.y);
@@ -186,6 +194,29 @@ int game() {
     glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
     glUniform1i(object_id_uniform, COW);
     cowModel.DrawVirtualObject("the_cow");
+
+    // BEZIER
+
+    glm::vec4 p0 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+    glm::vec4 p1 = glm::vec4(10.0f, -4.0f, 0.0f, 0.0f);
+    glm::vec4 c0 = glm::vec4(-10.0f, -6.0f, 0.0f, 0.0f);
+    glm::vec4 c1 = glm::vec4(0.0f, -10.0f, 0.0f, 0.0f);
+
+    if (c > 1.0f) c = 0.0f;
+    
+    glm::vec4 point = bezier.calculate(p0, p1, c0, c1, c);
+
+    c += BEZIER_SPEED * deltaTime;
+
+    printf("%f %f %f %f %f\n", point[0], point[1], point[2], point[3], c);
+
+    model = Matrix_Identity() * Matrix_Translate(point[0], point[1], 0);
+
+    #define LEAF 5
+
+    glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+    glUniform1i(object_id_uniform, LEAF);
+    leafModel.DrawVirtualObject("the_leaf");
 
     // O framebuffer onde OpenGL executa as operações de renderização não
     // é o mesmo que está sendo mostrado para o usuário, caso contrário
