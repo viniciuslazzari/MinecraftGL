@@ -63,5 +63,6 @@ extern Camera camera;
 
 extern glm::vec4 mapData[MAP_SIZE][MAP_SIZE];
 extern glm::vec3 cowPosition;
+extern glm::vec3 cowRotate;
 
 #endif

@@ -98,6 +98,9 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     else if (key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT)) camera.setUpdatingPosition(down);
     else if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT)) camera.setUpdatingPosition(left);
     else if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT)) camera.setUpdatingPosition(right);
+
+    if (key == GLFW_KEY_K && (action == GLFW_PRESS || action == GLFW_REPEAT)) cowRotate.y+=0.1f;
+    if (key == GLFW_KEY_J && (action == GLFW_PRESS || action == GLFW_REPEAT)) cowRotate.y-=0.1f;
 }
 
 // Definimos o callback para impressão de erros da GLFW no terminal

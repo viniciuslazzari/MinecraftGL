@@ -73,6 +73,20 @@ int game() {
   // Aula_09_Projecoes.pdf.
   glEnable(GL_DEPTH_TEST);
 
+
+  Texture skyBack = Texture("assets/sky_back.png", GL_TEXTURE_2D);
+  skyBack.load();
+  Texture skyDown = Texture("assets/sky_down.png", GL_TEXTURE_2D);
+  skyDown.load();
+  Texture skyUp = Texture("assets/sky_up.png", GL_TEXTURE_2D);
+  skyUp.load();
+  Texture skyRight = Texture("assets/sky_right.png", GL_TEXTURE_2D);
+  skyRight.load();
+  Texture skyLeft = Texture("assets/sky_left.png", GL_TEXTURE_2D);
+  skyLeft.load();
+  Texture skyFront = Texture("assets/sky_front.png", GL_TEXTURE_2D);
+  skyFront.load();
+
   Texture grassSideTexture = Texture("assets/grass_side.png", GL_TEXTURE_2D);
   grassSideTexture.load();
 
@@ -167,7 +181,7 @@ int game() {
                                       0.0f);
     }
 
-    model = Matrix_Translate(cowPosition.x, cowPosition.y, cowPosition.z);
+    model = Matrix_Translate(cowPosition.x, cowPosition.y, cowPosition.z) * Matrix_Rotate_Y(cowRotate.y);
 
     glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
     glUniform1i(object_id_uniform, COW);
