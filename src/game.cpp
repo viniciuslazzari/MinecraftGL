@@ -208,8 +208,6 @@ int game() {
 
     c += BEZIER_SPEED * deltaTime;
 
-    printf("%f %f %f %f %f\n", point[0], point[1], point[2], point[3], c);
-
     model = Matrix_Identity() * Matrix_Translate(point[0], point[1], 0);
 
     #define LEAF 5
