@@ -11,7 +11,7 @@ A minecraft implementation using C++ and OpenGL.
 - [X] Object instances
 - [X] Three types of intersection test
 - [X] Difuse lighting model
-- [ ] Blinn-Phong lighting model
+- [X] Blinn-Phong lighting model
 - [ ] Phong interpolation model
 - [ ] Gouraud interpolation model
 - [X] Texture mapping
