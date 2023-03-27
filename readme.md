@@ -12,7 +12,7 @@ A minecraft implementation using C++ and OpenGL.
 - [X] Three types of intersection test
 - [X] Difuse lighting model
 - [X] Blinn-Phong lighting model
-- [ ] Phong interpolation model
+- [X] Phong interpolation model
 - [ ] Gouraud interpolation model
 - [X] Texture mapping
 - [X] Cubic Bézier moving
