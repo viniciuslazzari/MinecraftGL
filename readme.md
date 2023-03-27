@@ -10,7 +10,7 @@ A minecraft implementation using C++ and OpenGL.
 - [X] Look-at camera
 - [X] Object instances
 - [X] Three types of intersection test
-- [ ] Difuse lighting model
+- [X] Difuse lighting model
 - [ ] Blinn-Phong lighting model
 - [ ] Phong interpolation model
 - [ ] Gouraud interpolation model
