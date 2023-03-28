@@ -40,8 +40,8 @@ void Camera::move(){
 }
 
 float Camera::returnX(){
-    float phi = this->isFree ? this->phiFree : this ->phiLook;
-    float tetha = this->isFree ? this->tethaFree : this ->tethaLook;
+    float phi = this->isFree ? this->phiFree : this->phiLook;
+    float tetha = this->isFree ? this->tethaFree : this->tethaLook;
 
     float r = this->distance;
 
@@ -49,15 +49,15 @@ float Camera::returnX(){
 }
 
 float Camera::returnY(){
-    float phi = this->isFree ? this->phiFree : this ->phiLook;
+    float phi = this->isFree ? this->phiFree : this->phiLook;
     float r = this->distance;
 
     return -r * sin(phi);
 }
 
 float Camera::returnZ(){
-    float phi = this->isFree ? this->phiFree : this ->phiLook;
-    float tetha = this->isFree ? this->tethaFree : this ->tethaLook;
+    float phi = this->isFree ? this->phiFree : this->phiLook;
+    float tetha = this->isFree ? this->tethaFree : this->tethaLook;
 
     float r = this->distance;
 
@@ -87,7 +87,7 @@ glm::mat4 Camera::getViewFree(){
     float y = this->returnY();
     float z = this->returnZ();
 
-    this->viewFree = glm::vec4(x, y, z, 0.0f); 
+    this->viewFree = glm::vec4(x, y, z, 0.0f);
 
     return Matrix_Camera_View(this->positionFree, this->viewFree, this->upVector);
 }
@@ -98,7 +98,7 @@ glm::mat4 Camera::getViewLook(){
     float z = this->returnZ();
 
     this->positionLook = glm::vec4(x, y, z, 1.0f);
-    glm::vec4 lookAt = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    glm::vec4 lookAt = glm::vec4(0.0f, -20.0f, 0.0f, 1.0f);
     this->viewLook = lookAt - this->positionLook;
 
     return Matrix_Camera_View(this->positionLook, this->viewLook, this->upVector);
@@ -110,8 +110,9 @@ glm::mat4 Camera::getView(){
     if (this->isFree){
         this->move();
         view = this->getViewFree();
+    } else {
+        view = this->getViewLook();
     }
-    else view = this->getViewLook();
 
     return view;
 }
