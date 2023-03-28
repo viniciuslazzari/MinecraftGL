@@ -30,21 +30,16 @@
 GLuint BuildTriangles();
 
 int game() {
-    WindowProvider windowProvider = WindowProvider(800, 800, "Teste");
+    WindowProvider windowProvider = WindowProvider(800, 800, "MinecraftGL");
 
     GLFWwindow *window = windowProvider.initWindow(
         ErrorCallback, KeyCallback, MouseButtonCallback, CursorPosCallback,
         ScrollCallback, FramebufferSizeCallback);
 
-    // Carregamento de todas funções definidas por OpenGL 3.3, utilizando a
-    // biblioteca GLAD.
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
     ShadersProvider shaderProvider = ShadersProvider();
 
-    // Carregamos os shaders de vértices e de fragmentos que serão utilizados
-    // para renderização. Veja slides 180-200 do documento
-    // Aula_03_Rendering_Pipeline_Grafico.pdf.
     GLuint programId = shaderProvider.loadShadersFromFiles();
 
     ObjModel cowModel("assets/cow.obj");
@@ -58,9 +53,6 @@ int game() {
     // Construímos a representação de um triângulo
     GLuint vertex_array_object_id = BuildTriangles();
 
-    // Buscamos o endereço das variáveis definidas dentro do Vertex Shader.
-    // Utilizaremos estas variáveis para enviar dados para a placa de vídeo
-    // (GPU)! Veja arquivo "shader_vertex.glsl".
     GLint model_uniform = glGetUniformLocation(programId, "model"); // Variável da matriz "model"
     GLint view_uniform = glGetUniformLocation(programId, "view"); // Variável da matriz "view" em shader_vertex.glsl
     GLint projection_uniform = glGetUniformLocation(programId, "projection"); // Variável da matriz "projection" em shader_vertex.glsl
@@ -70,9 +62,8 @@ int game() {
     PerlinNoise pn = PerlinNoise(MAP_SIZE, MAP_SIZE);
 
     vector<vector<float>> map = pn.generateNoise(6);
+    int init = -MAP_SIZE / 2;
 
-    // Habilitamos o Z-buffer. Veja slides 104-116 do documento
-    // Aula_09_Projecoes.pdf.
     glEnable(GL_DEPTH_TEST);
 
     Texture skyBack = Texture("assets/sky_back.png", GL_TEXTURE_2D);
@@ -101,7 +92,14 @@ int game() {
 
     std::chrono::time_point<std::chrono::high_resolution_clock> elapsedTime, timeSinceLastFrame;
 
+    // BEZIER VARIABLES
+
     float c = 0.0f;
+
+    glm::vec4 p0 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+    glm::vec4 p1 = glm::vec4(10.0f, -4.0f, 0.0f, 0.0f);
+    glm::vec4 c0 = glm::vec4(-10.0f, -6.0f, 0.0f, 0.0f);
+    glm::vec4 c1 = glm::vec4(0.0f, -10.0f, 0.0f, 0.0f);
 
     double lastTime = glfwGetTime();
     int nbFrames = 0;
@@ -110,8 +108,7 @@ int game() {
     while (!glfwWindowShouldClose(window)) {
         double currentTime = glfwGetTime();
         nbFrames++;
-        if ( currentTime - lastTime >= 1.0 ){ // If last prinf() was more than 1 sec ago
-            // printf and reset timer
+        if ( currentTime - lastTime >= 1.0 ){
             printf("%f ms/frame\n", 1000.0/double(nbFrames));
             nbFrames = 0;
             lastTime += 1.0;
@@ -123,17 +120,10 @@ int game() {
 
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-        // "Pintamos" todos os pixels do framebuffer com a cor definida acima,
-        // e também resetamos todos os pixels do Z-buffer (depth buffer).
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Pedimos para a GPU utilizar o programa de GPU criado acima (contendo
-        // os shaders de vértice e fragmentos).
         glUseProgram(programId);
 
-        // "Ligamos" o VAO. Informamos que queremos utilizar os atributos de
-        // vértices apontados pelo VAO criado pela função BuildTriangles(). Veja
-        // comentários detalhados dentro da definição de BuildTriangles().
         glBindVertexArray(vertex_array_object_id);
 
         glm::mat4 view = camera.getView();
@@ -144,12 +134,10 @@ int game() {
 
         glUniform1i(sampler_uniform, 0);
 
-        int init = -MAP_SIZE / 2;
-
         glm::mat4 model;
 
         for (int i = 0; i < MAP_SIZE; ++i) {
-            for (int j = 0; j < MAP_SIZE; j++) {
+            for (int j = 0; j < MAP_SIZE; ++j) {
                 model = Matrix_Translate(init + i * 1.0f, map[i][j] - 20, init + j * 1.0f);
 
                 mapData[i][j] = model[3];
@@ -197,11 +185,6 @@ int game() {
 
         // BEZIER
 
-        glm::vec4 p0 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-        glm::vec4 p1 = glm::vec4(10.0f, -4.0f, 0.0f, 0.0f);
-        glm::vec4 c0 = glm::vec4(-10.0f, -6.0f, 0.0f, 0.0f);
-        glm::vec4 c1 = glm::vec4(0.0f, -10.0f, 0.0f, 0.0f);
-
         if (c > 1.0f) c = 0.0f;
         
         glm::vec4 point = bezier.calculate(p0, p1, c0, c1, c);
@@ -216,30 +199,16 @@ int game() {
         glUniform1i(object_id_uniform, LEAF);
         leafModel.DrawVirtualObject("the_leaf");
 
-        // O framebuffer onde OpenGL executa as operações de renderização não
-        // é o mesmo que está sendo mostrado para o usuário, caso contrário
-        // seria possível ver artefatos conhecidos como "screen tearing". A
-        // chamada abaixo faz a troca dos buffers, mostrando para o usuário
-        // tudo que foi renderizado pelas funções acima.
-        // Veja o link:
-        // https://en.wikipedia.org/w/index.php?title=Multiple_buffering&oldid=793452829#Double_buffering_in_computer_graphics
         glfwSwapBuffers(window);
 
-        // Verificamos com o sistema operacional se houve alguma interação do
-        // usuário (teclado, mouse, ...). Caso positivo, as funções de callback
-        // definidas anteriormente usando glfwSet*Callback() serão chamadas
-        // pela biblioteca GLFW.
         glfwPollEvents();
     }
 
-    // Finalizamos o uso dos recursos do sistema operacional
     glfwTerminate();
 
-    // Fim do programa
     return 0;
 }
 
-// Constrói triângulos para futura renderização
 GLuint BuildTriangles() {
     GLfloat model_coefficients[] = {
         // front face
@@ -375,64 +344,37 @@ GLuint BuildTriangles() {
                         20, 21, 22, 
                         20, 22, 23};
 
-    // Criamos um primeiro objeto virtual (SceneObject) que se refere às faces
-    // coloridas do cubo.
     SceneObject cube_sides;
     cube_sides.name = "Lados do cubo";
-    cube_sides.firstIndex = 0; // Primeiro índice está em indices[0]
-    cube_sides.numIndexes = 24; // Último índice está em indices[35]; total de 36 índices.
-    cube_sides.renderingMode = GL_TRIANGLES; // Índices correspondem ao tipo de rasterização GL_TRIANGLES.
+    cube_sides.firstIndex = 0; 
+    cube_sides.numIndexes = 24;
+    cube_sides.renderingMode = GL_TRIANGLES; 
 
-    // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
     g_VirtualScene["cube_sides"] = cube_sides;
 
-    // Criamos um primeiro objeto virtual (SceneObject) que se refere às faces
-    // coloridas do cubo.
     SceneObject cube_top;
     cube_top.name = "Topo do cubo";
-    cube_top.firstIndex = 24 * sizeof(unsigned int); // Primeiro índice está em indices[0]
-    cube_top.numIndexes = 6; // Último índice está em indices[35]; total de 36 índices.
-    cube_top.renderingMode = GL_TRIANGLES; // Índices correspondem ao tipo de rasterização GL_TRIANGLES.
+    cube_top.firstIndex = 24 * sizeof(unsigned int);
+    cube_top.numIndexes = 6;
+    cube_top.renderingMode = GL_TRIANGLES;
 
-    // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
     g_VirtualScene["cube_top"] = cube_top;
 
-    // Criamos um primeiro objeto virtual (SceneObject) que se refere às faces
-    // coloridas do cubo.
     SceneObject cube_base;
     cube_base.name = "Base do cubo";
-    cube_base.firstIndex = 30 * sizeof(unsigned int); // Primeiro índice está em indices[0]
-    cube_base.numIndexes = 6; // Último índice está em indices[35]; total de 36 índices.
-    cube_base.renderingMode = GL_TRIANGLES; // Índices correspondem ao tipo de rasterização GL_TRIANGLES.
+    cube_base.firstIndex = 30 * sizeof(unsigned int);
+    cube_base.numIndexes = 6;
+    cube_base.renderingMode = GL_TRIANGLES;
 
-    // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
     g_VirtualScene["cube_base"] = cube_base;
 
-    // Criamos um buffer OpenGL para armazenar os índices acima
     GLuint indices_id;
     glGenBuffers(1, &indices_id);
-
-    // "Ligamos" o buffer. Note que o tipo agora é GL_ELEMENT_ARRAY_BUFFER.
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_id);
-
-    // Alocamos memória para o buffer.
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), NULL, GL_STATIC_DRAW);
-
-    // Copiamos os valores do array indices[] para dentro do buffer.
     glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(indices), indices);
 
-    // NÃO faça a chamada abaixo! Diferente de um VBO (GL_ARRAY_BUFFER), um
-    // array de índices (GL_ELEMENT_ARRAY_BUFFER) não pode ser "desligado",
-    // caso contrário o VAO irá perder a informação sobre os índices.
-    //
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // XXX Errado!
-    //
-
-    // "Desligamos" o VAO, evitando assim que operações posteriores venham a
-    // alterar o mesmo. Isso evita bugs.
     glBindVertexArray(0);
 
-    // Retornamos o ID do VAO. Isso é tudo que será necessário para renderizar
-    // os triângulos definidos acima. Veja a chamada glDrawElements() em main().
     return vertex_array_object_id;
 }
