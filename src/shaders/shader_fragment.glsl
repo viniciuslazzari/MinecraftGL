@@ -3,11 +3,16 @@
 in vec4 position_world;
 in vec4 normal;
 in vec2 texture_coords;
+in vec3 gouraud;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 uniform sampler2D sampler;
+
+uniform int object_id;
+#define COW 4
+
 
 out vec4 color;
 
@@ -42,7 +47,7 @@ void main()
     vec3 I = vec3(1.0,1.0,1.0);
 
     // Espectro da luz ambiente
-    vec3 Ia = vec3(0.5,0.5,0.5);
+    vec3 ia = vec3(0.5,0.5,0.5);
 
     // Termo difuso utilizando a lei dos cossenos de Lambert
     vec3 lambert_diffuse_term = Kd * I * max(0, dot(n, l));
@@ -55,7 +60,13 @@ void main()
 
     vec3 texture_color = texture(sampler, texture_coords).xyz;
 
-    color.rgb = (ambient_term + lambert_diffuse_term) * texture_color + phong_specular_term;
+    // Se objeto for a vaca, utilizar Gouraud
+    if(object_id == COW){
+        color.rgb = gouraud * texture_color;
+    }
+    else{
+        color.rgb = (ambient_term + lambert_diffuse_term) * texture_color + phong_specular_term;
+    }
 
     color.a = 1.0;
 } 
