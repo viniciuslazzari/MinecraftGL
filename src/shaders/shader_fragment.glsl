@@ -47,7 +47,7 @@ void main()
     vec3 I = vec3(1.0,1.0,1.0);
 
     // Espectro da luz ambiente
-    vec3 ia = vec3(0.5,0.5,0.5);
+    vec3 Ia = vec3(0.5,0.5,0.5);
 
     // Termo difuso utilizando a lei dos cossenos de Lambert
     vec3 lambert_diffuse_term = Kd * I * max(0, dot(n, l));
