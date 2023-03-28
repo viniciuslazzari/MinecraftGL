@@ -24,5 +24,5 @@ glm::vec4 camera_view_look = glm::vec4(0.0f, 0.0f, 2.5f, 1.0f);
 
 Camera camera = Camera(10.0f, 2.5f, camera_position_free, camera_position_look, camera_view_free, camera_view_look);
 glm::vec4 mapData[MAP_SIZE][MAP_SIZE] = {glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)};
-glm::vec3 cowPosition= glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 cowPosition = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 cowRotate = glm::vec3(0.0f,0.0f,0.0f);

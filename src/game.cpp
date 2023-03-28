@@ -58,6 +58,7 @@ int game() {
     GLint projection_uniform = glGetUniformLocation(programId, "projection"); // Variável da matriz "projection" em shader_vertex.glsl
     GLint object_id_uniform = glGetUniformLocation(programId, "object_id"); // Variável booleana em shader_vertex.glsl
     GLint sampler_uniform = glGetUniformLocation(programId, "sampler");
+    GLint gouraud_uniform = glGetUniformLocation(programId, "gouraud");
 
     PerlinNoise pn = PerlinNoise(MAP_SIZE, MAP_SIZE);
 
@@ -133,6 +134,7 @@ int game() {
         glUniformMatrix4fv(projection_uniform, 1, GL_FALSE, glm::value_ptr(projection));
 
         glUniform1i(sampler_uniform, 0);
+        glUniform1i(gouraud_uniform, 0);
 
         glm::mat4 model;
 
@@ -156,11 +158,11 @@ int game() {
                             g_VirtualScene["cube_top"].numIndexes, GL_UNSIGNED_INT,
                             (void *)g_VirtualScene["cube_top"].firstIndex);
 
-                dirtTexture.bind(GL_TEXTURE0);
+                // dirtTexture.bind(GL_TEXTURE0);
 
-                glDrawElements(g_VirtualScene["cube_base"].renderingMode,
-                            g_VirtualScene["cube_base"].numIndexes, GL_UNSIGNED_INT,
-                            (void *)g_VirtualScene["cube_base"].firstIndex);
+                // glDrawElements(g_VirtualScene["cube_base"].renderingMode,
+                //             g_VirtualScene["cube_base"].numIndexes, GL_UNSIGNED_INT,
+                //             (void *)g_VirtualScene["cube_base"].firstIndex);
             }
         }
 
@@ -179,6 +181,7 @@ int game() {
 
         model = Matrix_Translate(cowPosition.x, cowPosition.y, cowPosition.z) * Matrix_Rotate_Y(cowRotate.y);
 
+        glUniform1i(gouraud_uniform, 1);
         glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(object_id_uniform, COW);
         cowModel.DrawVirtualObject("the_cow");
