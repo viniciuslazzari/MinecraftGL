@@ -13,7 +13,7 @@ A minecraft implementation using C++ and OpenGL.
 - [X] Difuse lighting model
 - [X] Blinn-Phong lighting model
 - [X] Phong interpolation model
-- [ ] Gouraud interpolation model
+- [X] Gouraud interpolation model
 - [X] Texture mapping
 - [X] Cubic Bézier moving
 - [X] Time-base animations
