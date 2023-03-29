@@ -52,7 +52,12 @@ void collideCameraWithCow(glm::vec4 &cameraPosition, glm::vec3 &cowPosition) {
 
   // Checa colisao da vaca com esfera de hit
   if (glm::distance(cameraPos, cowPos) < cowRadius) {
-      std::cout<<"VOCE GANHOU"<<std::endl;
+    std::cout << "\n\n";
+    std::cout << "╔══════════════════════════╗\n";
+    std::cout << "║      PARABENS! VOCE      ║\n";
+    std::cout << "║          GANHOU!         ║\n";
+    std::cout << "╚══════════════════════════╝\n";
+    std::cout << "\n\n";
       win = true;
   } 
 }

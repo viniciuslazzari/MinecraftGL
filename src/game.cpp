@@ -28,6 +28,7 @@
 #define BEZIER_SPEED 0.1
 
 GLuint BuildTriangles();
+bool spawn = true;
 
 int game() {
   WindowProvider windowProvider = WindowProvider(800, 800, "Teste");
@@ -182,6 +183,13 @@ int game() {
 
     // Define the elapsed time since the start of the program
     float time = glfwGetTime();
+    if (spawn){
+        srand(time);
+        cowPosition.x = rand()%60-30;
+        cowPosition.z = rand()%60-30;
+        spawn = false;
+    }
+
  
     // Calculate the new position of the model based on the elapsed time
     if (!collideCowWithMap(cowPosition, mapData)) {
