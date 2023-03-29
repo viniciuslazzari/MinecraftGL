@@ -1,8 +1,7 @@
 #include "collisions.hpp"
 #include "globals.hpp"
-
 // map block collision
-#define DISTANCE 2.0f 
+#define DISTANCE 2.0f
 
 // point-cube collision
 void collideCameraWithMap(glm::vec4 &position,
@@ -54,24 +53,27 @@ void collideCameraWithCow(glm::vec4 &cameraPosition, glm::vec3 &cowPosition) {
   glm::vec3 cowPos = glm::vec3(cowPosition);
   float cowRadius = 1.5f;
 
-
   // Checa colisao da vaca com esfera de hit
   if (glm::distance(cameraPos, cowPos) < cowRadius) {
     cameraPosition = previousCameraPosition;
   } else {
     previousCameraPosition = cameraPosition;
   }
-
 }
 
 // cube-cube collision
-bool collideCowWithMap(glm::vec3 cowPosition, glm::vec4 mapData[64][64]) {
-  int x = (int)floor(cowPosition.x);
-  int z = (int)floor(cowPosition.z);
-
-  if (cowPosition.y <= mapData[x + MAP_SIZE / 2][z + MAP_SIZE / 2].y + 1.5) {
+bool collideCowWithMap(glm::vec3 &cowPosition, glm::vec4 mapData[64][64]) {
+  int x = int(cowPosition.x) - 1 + MAP_SIZE / 2;
+  int z = int(cowPosition.z) - 1 + MAP_SIZE / 2;
+  if (cowPosition.y < mapData[x - 1][z].y + 2 ||
+      cowPosition.y < mapData[x - 2][z].y + 2 ||
+      cowPosition.y < mapData[x - 3][z].y + 2) {
     return true;
   }
-
+  if (cowPosition.y < mapData[x][z - 1].y + 2 ||
+      cowPosition.y < mapData[x][z - 2].y + 2 ||
+      cowPosition.y < mapData[x][z - 3].y + 2) {
+    return true;
+  }
   return false;
 }

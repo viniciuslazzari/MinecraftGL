@@ -26,3 +26,20 @@ Camera camera = Camera(10.0f, 2.5f, camera_position_free, camera_position_look, 
 glm::vec4 mapData[MAP_SIZE][MAP_SIZE] = {glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)};
 glm::vec3 cowPosition= glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 cowRotate = glm::vec3(0.0f,0.0f,0.0f);
+void CowMovement(int direction){
+    float speed = 5.0f;
+    if (direction == 0) {
+        cowPosition.x += deltaTime * speed;
+    }
+    else if (direction == 1) {
+        cowPosition.x -= deltaTime * speed;
+        cowRotate.y = 180.0f;
+    }
+    else if (direction == 2) {
+        cowPosition.z -= deltaTime * speed;
+    }
+    else if (direction == 3) {
+        cowPosition.z += deltaTime * speed;
+    }
+   
+}

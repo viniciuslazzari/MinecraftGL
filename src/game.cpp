@@ -183,13 +183,23 @@ int game() {
 
     // Define the elapsed time since the start of the program
     float time = glfwGetTime();
-
+ 
     // Calculate the new position of the model based on the elapsed time
     if (!collideCowWithMap(cowPosition, mapData)) {
-      cowPosition = initialPosition + glm::vec3(0.0f, -speed * time, 0.0f);
+      cowPosition.y =  -speed * time;
+    }
+    else
+    {
+    int cowX = int(cowPosition.x)-1 +  MAP_SIZE / 2;
+    int cowZ = int(cowPosition.z) -1 + MAP_SIZE / 2;
+    std::cout << "X: " << cowX << " Z: " << cowZ << std::endl;
+    std::cout << "Y: " << mapData[cowX][cowZ].y << std::endl;
+        cowPosition.y =  mapData[cowX][cowZ].y + 1.25f;
     }
 
-    model = Matrix_Translate(cowPosition.x, cowPosition.y, cowPosition.z) * Matrix_Rotate_Y(cowRotate.y);
+    model = Matrix_Translate(initialPosition.x, initialPosition.y, initialPosition.z)
+          * Matrix_Translate(cowPosition.x, cowPosition.y, cowPosition.z) 
+          * Matrix_Rotate_Y(cowRotate.y);
 
     glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
     glUniform1i(object_id_uniform, COW);
@@ -238,6 +248,13 @@ int game() {
   // Fim do programa
   return 0;
 }
+
+// Cow movement with time acceleration, cowPostion is the cow position, deltaTime is the time between frames, cowPosition
+// updates using multiplication of deltaTime and speed
+// movement is the direction of the cow the cow looks at
+
+
+
 
 // Constrói triângulos para futura renderização
 GLuint BuildTriangles() {
