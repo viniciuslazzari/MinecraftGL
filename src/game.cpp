@@ -177,7 +177,6 @@ int game() {
     }
 
     #define COW 4
-    // Define the initial position and the speed of the model
     glm::vec3 initialPosition = glm::vec3(0.0f, 0.0f, 0.0f);
     float speed = 5.0f;
 
@@ -238,6 +237,10 @@ int game() {
     // definidas anteriormente usando glfwSet*Callback() serão chamadas
     // pela biblioteca GLFW.
     glfwPollEvents();
+
+    if(win){
+        break;
+    }
   }
 
   // Finalizamos o uso dos recursos do sistema operacional

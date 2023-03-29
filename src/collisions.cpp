@@ -1,5 +1,6 @@
 #include "collisions.hpp"
 #include "globals.hpp"
+#include <iostream>
 // map block collision
 #define DISTANCE 2.0f
 
@@ -51,10 +52,9 @@ void collideCameraWithCow(glm::vec4 &cameraPosition, glm::vec3 &cowPosition) {
 
   // Checa colisao da vaca com esfera de hit
   if (glm::distance(cameraPos, cowPos) < cowRadius) {
-    cameraPosition = previousCameraPosition;
-  } else {
-    previousCameraPosition = cameraPosition;
-  }
+      std::cout<<"VOCE GANHOU"<<std::endl;
+      win = true;
+  } 
 }
 
 // cube-cube collision

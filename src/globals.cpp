@@ -7,6 +7,7 @@
 std::map<std::string, SceneObject> g_VirtualScene;
 
 bool windowIsFocused = false;
+bool win = false;
 
 // "g_LeftMouseButtonPressed = true" se o usuário está com o botão esquerdo do mouse
 // pressionado no momento atual. Veja função MouseButtonCallback().

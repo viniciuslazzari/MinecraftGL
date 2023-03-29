@@ -29,6 +29,7 @@ class SceneObject {
 extern std::map<std::string, SceneObject> g_VirtualScene;
 
 extern bool windowIsFocused;
+extern bool win;
 
 // Razão de proporção da janela (largura/altura). Veja função FramebufferSizeCallback().
 extern float g_ScreenRatio;
