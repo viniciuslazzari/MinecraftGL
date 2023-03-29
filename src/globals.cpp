@@ -33,7 +33,6 @@ void CowMovement(int direction){
     }
     else if (direction == 1) {
         cowPosition.x -= deltaTime * speed;
-        cowRotate.y = 180.0f;
     }
     else if (direction == 2) {
         cowPosition.z -= deltaTime * speed;

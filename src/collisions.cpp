@@ -3,6 +3,7 @@
 // map block collision
 #define DISTANCE 2.0f
 
+glm::vec4 previousCameraPosition;
 // point-cube collision
 void collideCameraWithMap(glm::vec4 &position,
                           glm::vec4 mapData[MAP_SIZE][MAP_SIZE]) {
@@ -10,41 +11,36 @@ void collideCameraWithMap(glm::vec4 &position,
   int x = static_cast<int>(floor(position.x)) + max_coord;
   int z = static_cast<int>(floor(position.z)) + max_coord;
 
-  if (x < 0) {
-    position.x = -max_coord;
-  } else if (x >= MAP_SIZE) {
-    position.x = max_coord;
-  } else if (z < 0) {
-    position.z = -max_coord;
-  } else if (z >= MAP_SIZE) {
-    position.z = max_coord;
+  if (x < 1 || x >= MAP_SIZE - 1 || z < 1 ||
+      z >= MAP_SIZE - 1) {
+    position = previousCameraPosition;
+  }
+
+  float blockTop = mapData[x][z].y + DISTANCE;
+  if (position.y < blockTop) {
+    position.y = blockTop;
   } else {
-    float blockTop = mapData[x][z].y + DISTANCE;
-    if (position.y < blockTop) {
-      position.y = blockTop;
-    } else {
-      float blockLeft = mapData[x][z].x;
-      float blockRight = blockLeft + DISTANCE;
-      float blockFront = mapData[x][z].z;
-      float blockBack = blockFront + DISTANCE;
+    float blockLeft = mapData[x][z].x;
+    float blockRight = blockLeft + DISTANCE;
+    float blockFront = mapData[x][z].z;
+    float blockBack = blockFront + DISTANCE;
 
-      if (position.x < blockLeft) {
-        position.x = blockLeft;
-      } else if (position.x > blockRight) {
-        position.x = blockRight;
-      }
+    if (position.x < blockLeft) {
+      position.x = blockLeft;
+    } else if (position.x > blockRight) {
+      position.x = blockRight;
+    }
 
-      if (position.z < blockFront) {
-        position.z = blockFront;
-      } else if (position.z > blockBack) {
-        position.z = blockBack;
-      }
+    if (position.z < blockFront) {
+      position.z = blockFront;
+    } else if (position.z > blockBack) {
+      position.z = blockBack;
     }
   }
 }
 
+
 // point-sphere collision
-glm::vec4 previousCameraPosition;
 void collideCameraWithCow(glm::vec4 &cameraPosition, glm::vec3 &cowPosition) {
   // posicao da camera interna da funcao
   glm::vec3 cameraPos = glm::vec3(cameraPosition);
@@ -62,7 +58,7 @@ void collideCameraWithCow(glm::vec4 &cameraPosition, glm::vec3 &cowPosition) {
 }
 
 // cube-cube collision
-bool collideCowWithMap(glm::vec3 &cowPosition, glm::vec4 mapData[64][64]) {
+bool collideCowWithMap(glm::vec3 &cowPosition, glm::vec4 mapData[MAP_SIZE][MAP_SIZE]) {
   int x = int(cowPosition.x) - 1 + MAP_SIZE / 2;
   int z = int(cowPosition.z) - 1 + MAP_SIZE / 2;
   if (cowPosition.y < mapData[x - 1][z].y + 2 ||
@@ -77,3 +73,5 @@ bool collideCowWithMap(glm::vec3 &cowPosition, glm::vec4 mapData[64][64]) {
   }
   return false;
 }
+
+

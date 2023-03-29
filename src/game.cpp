@@ -178,7 +178,7 @@ int game() {
 
     #define COW 4
     // Define the initial position and the speed of the model
-    glm::vec3 initialPosition = glm::vec3(-2.0f, 0.0f, -2.0f);
+    glm::vec3 initialPosition = glm::vec3(0.0f, 0.0f, 0.0f);
     float speed = 5.0f;
 
     // Define the elapsed time since the start of the program
@@ -192,8 +192,6 @@ int game() {
     {
     int cowX = int(cowPosition.x)-1 +  MAP_SIZE / 2;
     int cowZ = int(cowPosition.z) -1 + MAP_SIZE / 2;
-    std::cout << "X: " << cowX << " Z: " << cowZ << std::endl;
-    std::cout << "Y: " << mapData[cowX][cowZ].y << std::endl;
         cowPosition.y =  mapData[cowX][cowZ].y + 1.25f;
     }
 
