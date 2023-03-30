@@ -124,7 +124,12 @@ int game() {
     deltaTime = elapsedTime - timeSinceLastFrame;
     timeSinceLastFrame = elapsedTime;
 
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    // 135, 206, 235
+    float r = 135.0f/255.0f;
+    float g = 206.0f/255.0f;
+    float b =  235.0f/255.0f;
+
+    glClearColor(r, g, b, 1.0f);
 
     // "Pintamos" todos os pixels do framebuffer com a cor definida acima,
     // e também resetamos todos os pixels do Z-buffer (depth buffer).
