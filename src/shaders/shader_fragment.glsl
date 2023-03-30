@@ -3,7 +3,7 @@
 in vec4 position_world;
 in vec4 normal;
 in vec2 texture_coords;
-in vec3 gouraud;
+in vec4 gouraud;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -12,7 +12,6 @@ uniform sampler2D sampler;
 
 uniform int object_id;
 #define COW 4
-
 
 out vec4 color;
 
@@ -62,7 +61,7 @@ void main()
 
     // Se objeto for a vaca, utilizar Gouraud
     if(object_id == COW){
-        color.rgb = gouraud * texture_color;
+        color = gouraud;
     }
     else{
         color.rgb = (ambient_term + lambert_diffuse_term) * texture_color + phong_specular_term;

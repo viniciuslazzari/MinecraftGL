@@ -38,7 +38,7 @@ void Camera::move(){
 
     this->positionFree.y= -this->speed * time; 
     collideCameraWithMap(this->positionFree, mapData);
-    collideCameraWithCow(this->positionFree, cowPosition);
+    collideCameraWithShell(this->positionFree, shellPosition);
 }
 
 

@@ -99,15 +99,15 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     else if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT)) camera.setUpdatingPosition(left);
     else if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT)) camera.setUpdatingPosition(right);
 
-    if (key == GLFW_KEY_K && (action == GLFW_PRESS || action == GLFW_REPEAT)) cowRotate.y+=0.1f;
-    if (key == GLFW_KEY_J && (action == GLFW_PRESS || action == GLFW_REPEAT)) cowRotate.y-=0.1f;
-    // smooth translation up arrow key, using acceleration x axis based on time, change cowPosition to change speed using multiplication for accel
+    if (key == GLFW_KEY_K && (action == GLFW_PRESS || action == GLFW_REPEAT)) shellRotate.y+=0.1f;
+    if (key == GLFW_KEY_J && (action == GLFW_PRESS || action == GLFW_REPEAT)) shellRotate.y-=0.1f;
+    // smooth translation up arrow key, using acceleration x axis based on time, change shellPosition to change speed using multiplication for accel
     if (key == GLFW_KEY_UP && (action == GLFW_PRESS || action == GLFW_REPEAT)) CowMovement(0);
-    // smooth translation down arrow key, using acceleration x axis based on time, change cowPosition to change speed using multiplication for accel
+    // smooth translation down arrow key, using acceleration x axis based on time, change shellPosition to change speed using multiplication for accel
     if (key == GLFW_KEY_DOWN && (action == GLFW_PRESS || action == GLFW_REPEAT)) CowMovement(1);
-    // smooth translation left arrow key, using acceleration x axis based on time, change cowPosition to change speed using multiplication for accel
+    // smooth translation left arrow key, using acceleration x axis based on time, change shellPosition to change speed using multiplication for accel
     if (key == GLFW_KEY_LEFT && (action == GLFW_PRESS || action == GLFW_REPEAT)) CowMovement(2);
-    // smooth translation right arrow key, using acceleration x axis based on time, change cowPosition to change speed using multiplication for accel
+    // smooth translation right arrow key, using acceleration x axis based on time, change shellPosition to change speed using multiplication for accel
     if (key == GLFW_KEY_RIGHT && (action == GLFW_PRESS || action == GLFW_REPEAT)) CowMovement(3);
 
 

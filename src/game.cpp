@@ -2,6 +2,9 @@
 #include <cstdio>
 #include <iostream>
 #include <string>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
@@ -48,9 +51,9 @@ int game() {
   // Aula_03_Rendering_Pipeline_Grafico.pdf.
   GLuint programId = shaderProvider.loadShadersFromFiles();
 
-  ObjModel cowModel("assets/cow.obj");
-  cowModel.ComputeNormals();
-  cowModel.BuildTrianglesAndAddToVirtualScene();
+  ObjModel shellModel("assets/shell.obj");
+  shellModel.ComputeNormals();
+  shellModel.BuildTrianglesAndAddToVirtualScene();
 
   ObjModel leafModel("assets/leaf.obj");
   leafModel.ComputeNormals();
@@ -81,7 +84,6 @@ int game() {
   // Aula_09_Projecoes.pdf.
   glEnable(GL_DEPTH_TEST);
 
-
   Texture skyBack = Texture("assets/sky_back.png", GL_TEXTURE_2D);
   skyBack.load();
   Texture skyDown = Texture("assets/sky_down.png", GL_TEXTURE_2D);
@@ -104,20 +106,22 @@ int game() {
   Texture dirtTexture = Texture("assets/dirt.png", GL_TEXTURE_2D);
   dirtTexture.load();
 
+  Texture cowTexture = Texture("assets/shell.jpg", GL_TEXTURE_2D);
+  cowTexture.load();
+
+  Texture leafTexture = Texture("assets/leaf.jpg", GL_TEXTURE_2D);
+  leafTexture.load();
+
   BezierCurve bezier = BezierCurve();
 
-  std::chrono::time_point<std::chrono::high_resolution_clock> elapsedTime,
-      timeSinceLastFrame;
+  float elapsedTime, timeSinceLastFrame = 0.0f;
 
   float c = 0.0f;
 
   // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
   while (!glfwWindowShouldClose(window)) {
-    elapsedTime = std::chrono::high_resolution_clock::now();
-    deltaTime = std::chrono::duration<double, std::milli>(elapsedTime -
-                                                          timeSinceLastFrame)
-                    .count() /
-                1000;
+    elapsedTime = glfwGetTime();
+    deltaTime = elapsedTime - timeSinceLastFrame;
     timeSinceLastFrame = elapsedTime;
 
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -182,33 +186,33 @@ int game() {
     float speed = 5.0f;
 
     // Define the elapsed time since the start of the program
-    float time = glfwGetTime();
+    float defTime = glfwGetTime();
     if (spawn){
-        srand(time);
-        cowPosition.x = rand()%60-30;
-        cowPosition.z = rand()%60-30;
+        srand(defTime);
+        shellPosition.x = rand()%60-30;
+        shellPosition.z = rand()%60-30;
         spawn = false;
     }
 
- 
     // Calculate the new position of the model based on the elapsed time
-    if (!collideCowWithMap(cowPosition, mapData)) {
-      cowPosition.y =  -speed * time;
-    }
-    else
-    {
-    int cowX = int(cowPosition.x)-1 +  MAP_SIZE / 2;
-    int cowZ = int(cowPosition.z) -1 + MAP_SIZE / 2;
-        cowPosition.y =  mapData[cowX][cowZ].y + 1.25f;
+    if (!collideShellWithMap(shellPosition, mapData)) {
+        shellPosition.y =  -speed * defTime;
+    } else {
+        int cowX = int(shellPosition.x) -1 +  MAP_SIZE / 2;
+        int cowZ = int(shellPosition.z) -1 + MAP_SIZE / 2;
+        shellPosition.y =  mapData[cowX][cowZ].y + 1.25f;
     }
 
+    cowTexture.bind(GL_TEXTURE0);
+
     model = Matrix_Translate(initialPosition.x, initialPosition.y, initialPosition.z)
-          * Matrix_Translate(cowPosition.x, cowPosition.y, cowPosition.z) 
-          * Matrix_Rotate_Y(cowRotate.y);
+          * Matrix_Translate(shellPosition.x, shellPosition.y, shellPosition.z) 
+          * Matrix_Rotate_Y(shellRotate.y)
+          * Matrix_Scale(0.01f, 0.01f, 0.01f);
 
     glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
     glUniform1i(object_id_uniform, COW);
-    cowModel.DrawVirtualObject("the_cow");
+    shellModel.DrawVirtualObject("shell");
 
     // BEZIER
 
@@ -226,6 +230,8 @@ int game() {
     model = Matrix_Identity() * Matrix_Translate(point[0], point[1], 0);
 
     #define LEAF 5
+
+    leafTexture.bind(GL_TEXTURE0);
 
     glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
     glUniform1i(object_id_uniform, LEAF);
@@ -258,7 +264,7 @@ int game() {
   return 0;
 }
 
-// Cow movement with time acceleration, cowPostion is the cow position, deltaTime is the time between frames, cowPosition
+// Cow movement with time acceleration, cowPostion is the cow position, deltaTime is the time between frames, shellPosition
 // updates using multiplication of deltaTime and speed
 // movement is the direction of the cow the cow looks at
 

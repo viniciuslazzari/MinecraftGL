@@ -42,12 +42,12 @@ void collideCameraWithMap(glm::vec4 &position,
 
 
 // point-sphere collision
-void collideCameraWithCow(glm::vec4 &cameraPosition, glm::vec3 &cowPosition) {
+void collideCameraWithShell(glm::vec4 &cameraPosition, glm::vec3 &shellPosition) {
   // posicao da camera interna da funcao
   glm::vec3 cameraPos = glm::vec3(cameraPosition);
 
   // posicao da vaca e estimativa do bounding box
-  glm::vec3 cowPos = glm::vec3(cowPosition);
+  glm::vec3 cowPos = glm::vec3(shellPosition);
   float cowRadius = 1.5f;
 
   // Checa colisao da vaca com esfera de hit
@@ -63,17 +63,19 @@ void collideCameraWithCow(glm::vec4 &cameraPosition, glm::vec3 &cowPosition) {
 }
 
 // cube-cube collision
-bool collideCowWithMap(glm::vec3 &cowPosition, glm::vec4 mapData[MAP_SIZE][MAP_SIZE]) {
-  int x = int(cowPosition.x) - 1 + MAP_SIZE / 2;
-  int z = int(cowPosition.z) - 1 + MAP_SIZE / 2;
-  if (cowPosition.y < mapData[x - 1][z].y + 2 ||
-      cowPosition.y < mapData[x - 2][z].y + 2 ||
-      cowPosition.y < mapData[x - 3][z].y + 2) {
+bool collideShellWithMap(glm::vec3 &shellPosition, glm::vec4 mapData[MAP_SIZE][MAP_SIZE]) {
+  int x = int(shellPosition.x) - 1 + MAP_SIZE / 2;
+  int z = int(shellPosition.z) - 1 + MAP_SIZE / 2;
+  float threshold = 1.5f;
+
+  if (shellPosition.y < mapData[x - 1][z].y + threshold ||
+      shellPosition.y < mapData[x - 2][z].y + threshold ||
+      shellPosition.y < mapData[x - 3][z].y + threshold) {
     return true;
   }
-  if (cowPosition.y < mapData[x][z - 1].y + 2 ||
-      cowPosition.y < mapData[x][z - 2].y + 2 ||
-      cowPosition.y < mapData[x][z - 3].y + 2) {
+  if (shellPosition.y < mapData[x][z - 1].y + threshold ||
+      shellPosition.y < mapData[x][z - 2].y + threshold ||
+      shellPosition.y < mapData[x][z - 3].y + threshold) {
     return true;
   }
   return false;

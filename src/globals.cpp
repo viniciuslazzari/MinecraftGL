@@ -25,21 +25,22 @@ glm::vec4 camera_view_look = glm::vec4(0.0f, 0.0f, 2.5f, 1.0f);
 
 Camera camera = Camera(10.0f, 2.5f, camera_position_free, camera_position_look, camera_view_free, camera_view_look);
 glm::vec4 mapData[MAP_SIZE][MAP_SIZE] = {glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)};
-glm::vec3 cowPosition= glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 cowRotate = glm::vec3(0.0f,0.0f,0.0f);
+glm::vec3 shellPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 shellRotate = glm::vec3(0.0f,0.0f,0.0f);
+
 void CowMovement(int direction){
-    float speed = 5.0f;
+    float speed = 20.0f;
+
     if (direction == 0) {
-        cowPosition.x += deltaTime * speed;
+        shellPosition.x += deltaTime * speed;
     }
     else if (direction == 1) {
-        cowPosition.x -= deltaTime * speed;
+        shellPosition.x -= deltaTime * speed;
     }
     else if (direction == 2) {
-        cowPosition.z -= deltaTime * speed;
+        shellPosition.z -= deltaTime * speed;
     }
     else if (direction == 3) {
-        cowPosition.z += deltaTime * speed;
+        shellPosition.z += deltaTime * speed;
     }
-   
 }
