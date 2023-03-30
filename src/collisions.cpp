@@ -8,18 +8,18 @@ glm::vec4 previousCameraPosition;
 // point-cube collision
 void collideCameraWithMap(glm::vec4 &position,
                           glm::vec4 mapData[MAP_SIZE][MAP_SIZE]) {
-  int max_coord = (MAP_SIZE / 2)-1;
-  int x = static_cast<int>(position.x) + max_coord;
-  int z = static_cast<int>(position.z) + max_coord;
+  int max_coord = MAP_SIZE / 2;
+  int x = static_cast<int>(floor(position.x)) + max_coord;
+  int z = static_cast<int>(floor(position.z)) + max_coord;
 
-  if (x < 1) {
-    position.x = -max_coord;
-  } else if (x >= MAP_SIZE-1) {
-    position.x = max_coord-1;
-  } else if (z < 1) {
-    position.z = -max_coord;
-  } else if (z >= MAP_SIZE-1) {
-    position.z = max_coord;
+  if (x < 1.5f) {
+    position.x = -max_coord+DISTANCE;
+  } else if (x >= MAP_SIZE) {
+    position.x = max_coord-0.5f;
+  } else if (z < 1.5f) {
+    position.z = -max_coord+DISTANCE;
+  } else if (z >= MAP_SIZE) {
+    position.z = max_coord-0.5f;
   } else {
     float blockTop = mapData[x][z].y + DISTANCE;
     if (position.y < blockTop) {

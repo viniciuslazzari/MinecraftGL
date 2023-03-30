@@ -22,7 +22,6 @@ void Camera::setUpdatingPosition(Direction direction){
 void Camera::move(){
     Direction direction = this->updatingPosition;
 
-    float time = glfwGetTime();
     if (direction == none) return;
 
     glm::vec4 w = -this->viewFree / norm(-this->viewFree);
@@ -36,9 +35,6 @@ void Camera::move(){
         default: break;
     }
 
-    this->positionFree.y= -this->speed * time; 
-    collideCameraWithMap(this->positionFree, mapData);
-    collideCameraWithShell(this->positionFree, shellPosition);
 }
 
 

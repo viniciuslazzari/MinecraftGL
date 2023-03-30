@@ -186,14 +186,18 @@ int game() {
       }
     }
 
+
     #define COW 4
     glm::vec3 initialPosition = glm::vec3(0.0f, 0.0f, 0.0f);
     float speed = 5.0f;
 
     // Define the elapsed time since the start of the program
     float defTime = glfwGetTime();
+    camera.positionFree.y= -speed * defTime; 
+    collideCameraWithMap(camera.positionFree, mapData);
+    collideCameraWithShell(camera.positionFree, shellPosition);
     if (spawn){
-        srand(defTime);
+        srand(time(NULL));
         shellPosition.x = rand()%60-30;
         shellPosition.z = rand()%60-30;
         spawn = false;

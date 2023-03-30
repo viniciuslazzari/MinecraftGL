@@ -26,13 +26,13 @@ class Camera {
         float speed;
         float distance;
 
-        glm::vec4 positionFree;
         glm::vec4 positionLook;
 
         glm::vec4 viewFree;
         glm::vec4 viewLook;
 
     public:
+        glm::vec4 positionFree;
         Camera(float speed, float distance, glm::vec4 positionFree, glm::vec4 positionLook, glm::vec4 viewFree, glm::vec4 viewLook);
         void move();
         float returnX();
