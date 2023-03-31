@@ -36,7 +36,7 @@ GLuint BuildTriangles();
 bool spawn = true;
 
 int game() {
-    WindowProvider windowProvider = WindowProvider(800, 800, "MInecraftGL");
+    WindowProvider windowProvider = WindowProvider(800, 800, "MinecraftGL");
 
     GLFWwindow *window = windowProvider.initWindow(
         ErrorCallback, KeyCallback, MouseButtonCallback, 
@@ -197,7 +197,7 @@ int game() {
         } else {
             int cowX = int(shellPosition.x) -1 +  MAP_SIZE / 2;
             int cowZ = int(shellPosition.z) -1 + MAP_SIZE / 2;
-            shellPosition.y =  mapData[cowX][cowZ].y + 1.25f;
+            shellPosition.y =  mapData[cowX][cowZ].y + 0.5f;
         }
 
         cowTexture.bind(GL_TEXTURE0);

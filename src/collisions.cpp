@@ -54,7 +54,7 @@ void collideCameraWithShell(glm::vec4 &cameraPosition, glm::vec3 &shellPosition)
 
     // posicao da vaca e estimativa do bounding box
     glm::vec3 cowPos = glm::vec3(shellPosition);
-    float cowRadius = 1.5f;
+    float cowRadius = 2.0f;
 
     // Checa colisao da vaca com esfera de hit
     if (glm::distance(cameraPos, cowPos) < cowRadius) {
@@ -72,7 +72,7 @@ void collideCameraWithShell(glm::vec4 &cameraPosition, glm::vec3 &shellPosition)
 bool collideShellWithMap(glm::vec3 &shellPosition, glm::vec4 mapData[MAP_SIZE][MAP_SIZE]) {
     int x = int(shellPosition.x) - 1 + MAP_SIZE / 2;
     int z = int(shellPosition.z) - 1 + MAP_SIZE / 2;
-    float threshold = 1.5f;
+    float threshold = 0.6f;
 
     if (shellPosition.y < mapData[x - 1][z].y + threshold ||
         shellPosition.y < mapData[x - 2][z].y + threshold ||
