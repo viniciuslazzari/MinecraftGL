@@ -18,7 +18,7 @@ out vec4 position_world;
 out vec4 normal;
 out vec4 gouraud;
 
-#define COW 4
+#define SHELL 4
 
 void main()
 {
@@ -31,7 +31,7 @@ void main()
 
     texture_coords = texture_coefficients;
     // Utilizar gouraud se o objeto for a vaca
-    if(object_id == COW){
+    if(object_id == SHELL){
         vec4 origin = vec4(0.0, 2.0, 1.0, 1.0);
 
         vec4 camera_position = inverse(view) * origin;

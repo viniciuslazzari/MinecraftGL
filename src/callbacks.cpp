@@ -102,13 +102,13 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     if (key == GLFW_KEY_K && (action == GLFW_PRESS || action == GLFW_REPEAT)) shellRotate.y+=0.1f;
     if (key == GLFW_KEY_J && (action == GLFW_PRESS || action == GLFW_REPEAT)) shellRotate.y-=0.1f;
     // smooth translation up arrow key, using acceleration x axis based on time, change shellPosition to change speed using multiplication for accel
-    if (key == GLFW_KEY_UP && (action == GLFW_PRESS || action == GLFW_REPEAT)) CowMovement(0);
+    if (key == GLFW_KEY_UP && (action == GLFW_PRESS || action == GLFW_REPEAT)) ShellMovement(0);
     // smooth translation down arrow key, using acceleration x axis based on time, change shellPosition to change speed using multiplication for accel
-    if (key == GLFW_KEY_DOWN && (action == GLFW_PRESS || action == GLFW_REPEAT)) CowMovement(1);
+    if (key == GLFW_KEY_DOWN && (action == GLFW_PRESS || action == GLFW_REPEAT)) ShellMovement(1);
     // smooth translation left arrow key, using acceleration x axis based on time, change shellPosition to change speed using multiplication for accel
-    if (key == GLFW_KEY_LEFT && (action == GLFW_PRESS || action == GLFW_REPEAT)) CowMovement(2);
+    if (key == GLFW_KEY_LEFT && (action == GLFW_PRESS || action == GLFW_REPEAT)) ShellMovement(2);
     // smooth translation right arrow key, using acceleration x axis based on time, change shellPosition to change speed using multiplication for accel
-    if (key == GLFW_KEY_RIGHT && (action == GLFW_PRESS || action == GLFW_REPEAT)) CowMovement(3);
+    if (key == GLFW_KEY_RIGHT && (action == GLFW_PRESS || action == GLFW_REPEAT)) ShellMovement(3);
 }
 
 // Definimos o callback para impressão de erros da GLFW no terminal

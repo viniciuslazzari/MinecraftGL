@@ -53,11 +53,11 @@ void collideCameraWithShell(glm::vec4 &cameraPosition, glm::vec3 &shellPosition)
     glm::vec3 cameraPos = glm::vec3(cameraPosition);
 
     // posicao da vaca e estimativa do bounding box
-    glm::vec3 cowPos = glm::vec3(shellPosition);
-    float cowRadius = 2.0f;
+    glm::vec3 shellPos = glm::vec3(shellPosition);
+    float shellRadius = 2.0f;
 
     // Checa colisao da vaca com esfera de hit
-    if (glm::distance(cameraPos, cowPos) < cowRadius) {
+    if (glm::distance(cameraPos, shellPos) < shellRadius) {
         std::cout << "\n\n";
         std::cout << "╔══════════════════════════╗\n";
         std::cout << "║      PARABENS! VOCE      ║\n";

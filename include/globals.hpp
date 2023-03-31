@@ -65,6 +65,6 @@ extern Camera camera;
 extern glm::vec4 mapData[MAP_SIZE][MAP_SIZE];
 extern glm::vec3 shellPosition;
 extern glm::vec3 shellRotate;
-extern void CowMovement(int direction);
+extern void ShellMovement(int direction);
 
 #endif

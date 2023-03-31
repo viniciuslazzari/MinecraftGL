@@ -28,7 +28,7 @@ glm::vec4 mapData[MAP_SIZE][MAP_SIZE] = {glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)};
 glm::vec3 shellPosition = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 shellRotate = glm::vec3(0.0f,0.0f,0.0f);
 
-void CowMovement(int direction){
+void ShellMovement(int direction){
     float speed = 20.0f;
 
     if (direction == 0) {

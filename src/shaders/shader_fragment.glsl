@@ -11,7 +11,7 @@ uniform mat4 projection;
 uniform sampler2D sampler;
 
 uniform int object_id;
-#define COW 4
+#define SHELL 4
 
 out vec4 color;
 
@@ -60,7 +60,7 @@ void main()
     vec3 texture_color = texture(sampler, texture_coords).xyz;
 
     // Se objeto for a vaca, utilizar Gouraud
-    if(object_id == COW){
+    if(object_id == SHELL){
         color = gouraud;
     }
     else{

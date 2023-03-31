@@ -28,7 +28,7 @@
 #include "window_provider.hpp"
 #include "bezier.hpp"
 
-#define COW 4
+#define SHELL 4
 #define LEAF 5
 #define BEZIER_SPEED 0.1
 
@@ -100,8 +100,8 @@ int game() {
     Texture grassTopTexture = Texture("assets/grass_top.jpg", GL_TEXTURE_2D);
     grassTopTexture.load();
 
-    Texture cowTexture = Texture("assets/shell.jpg", GL_TEXTURE_2D);
-    cowTexture.load();
+    Texture shellTexture = Texture("assets/shell.jpg", GL_TEXTURE_2D);
+    shellTexture.load();
 
     Texture leafTexture = Texture("assets/leaf.jpg", GL_TEXTURE_2D);
     leafTexture.load();
@@ -195,12 +195,12 @@ int game() {
         if (!collideShellWithMap(shellPosition, mapData)) {
             shellPosition.y =  -speed * defTime;
         } else {
-            int cowX = int(shellPosition.x) -1 +  MAP_SIZE / 2;
-            int cowZ = int(shellPosition.z) -1 + MAP_SIZE / 2;
-            shellPosition.y =  mapData[cowX][cowZ].y + 0.5f;
+            int shellX = int(shellPosition.x) -1 +  MAP_SIZE / 2;
+            int shellZ = int(shellPosition.z) -1 + MAP_SIZE / 2;
+            shellPosition.y =  mapData[shellX][shellZ].y + 0.5f;
         }
 
-        cowTexture.bind(GL_TEXTURE0);
+        shellTexture.bind(GL_TEXTURE0);
 
         model = Matrix_Translate(initialPosition.x, initialPosition.y, initialPosition.z)
             * Matrix_Translate(shellPosition.x, shellPosition.y, shellPosition.z) 
@@ -208,7 +208,7 @@ int game() {
             * Matrix_Scale(0.01f, 0.01f, 0.01f);
 
         glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(object_id_uniform, COW);
+        glUniform1i(object_id_uniform, SHELL);
         shellModel.DrawVirtualObject("shell");
 
         // BEZIER
@@ -257,9 +257,6 @@ int game() {
     return 0;
 }
 
-// Cow movement with time acceleration, cowPostion is the cow position, deltaTime is the time between frames, shellPosition
-// updates using multiplication of deltaTime and speed
-// movement is the direction of the cow the cow looks at
 
 
 
