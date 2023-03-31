@@ -37,7 +37,6 @@ void Camera::move(){
 
 }
 
-
 float Camera::returnX(){
     float phi = this->isFree ? this->phiFree : this->phiLook;
     float tetha = this->isFree ? this->tethaFree : this->tethaLook;
