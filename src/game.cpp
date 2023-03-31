@@ -210,8 +210,8 @@ int game() {
 
         if (spawn){
             srand(time(NULL));
-            shellPosition.x = rand()%60-30;
-            shellPosition.z = rand()%60-30;
+            shellPosition.x = rand()%(MAP_SIZE-4)-(MAP_SIZE/2-4);
+            shellPosition.z = rand()%(MAP_SIZE-4)-(MAP_SIZE/2-4);
             spawn = false;
         }
 
