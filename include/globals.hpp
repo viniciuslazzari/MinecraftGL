@@ -10,7 +10,7 @@
                        
 #include "camera.hpp"
 
-#define MAP_SIZE 64
+#define MAP_SIZE 256
 // Definimos uma estrutura que armazenará dados necessários para renderizar
 // cada objeto da cena virtual.
 class SceneObject {

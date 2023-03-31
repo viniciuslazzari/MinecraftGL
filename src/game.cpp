@@ -160,10 +160,34 @@ int game() {
 
                 grassSideTexture.bind(GL_TEXTURE0);
 
-                glDrawElements(g_VirtualScene["cube_sides"].renderingMode,
-                    g_VirtualScene["cube_sides"].numIndexes, GL_UNSIGNED_INT,
-                    (void *)g_VirtualScene["cube_sides"].firstIndex
-                );
+                // OS TESTES SAO PARA APENAS RENDERIZAR AS PARTE VISÍVEIS DO CUBO
+                if (j + 1 != MAP_SIZE && map[i][j] > map[i][j + 1]){
+                    glDrawElements(g_VirtualScene["cube_front"].renderingMode,
+                        g_VirtualScene["cube_front"].numIndexes, GL_UNSIGNED_INT,
+                        (void *)g_VirtualScene["cube_front"].firstIndex
+                    );
+                }
+
+                if (i + 1 != MAP_SIZE && map[i][j] > map[i + 1][j]){
+                    glDrawElements(g_VirtualScene["cube_right"].renderingMode,
+                        g_VirtualScene["cube_right"].numIndexes, GL_UNSIGNED_INT,
+                        (void *)g_VirtualScene["cube_right"].firstIndex
+                    );
+                }
+
+                if (j != 0 && map[i][j] > map[i][j - 1]){
+                    glDrawElements(g_VirtualScene["cube_back"].renderingMode,
+                        g_VirtualScene["cube_back"].numIndexes, GL_UNSIGNED_INT,
+                        (void *)g_VirtualScene["cube_back"].firstIndex
+                    );
+                }
+
+                if (i != 0 && map[i][j] > map[i - 1][j]){
+                    glDrawElements(g_VirtualScene["cube_left"].renderingMode,
+                        g_VirtualScene["cube_left"].numIndexes, GL_UNSIGNED_INT,
+                        (void *)g_VirtualScene["cube_left"].firstIndex
+                    );
+                }
 
                 grassTopTexture.bind(GL_TEXTURE0);
 
@@ -385,14 +409,41 @@ GLuint BuildTriangles() {
     };
 
 
-    SceneObject cube_sides;
-    cube_sides.name = "Lados do cubo";
-    cube_sides.firstIndex = 0;
-    cube_sides.numIndexes = 24;
-    cube_sides.renderingMode = GL_TRIANGLES;
+    SceneObject cube_front;
+    cube_front.name = "Frente do cubo";
+    cube_front.firstIndex = 0 * sizeof(unsigned int);;
+    cube_front.numIndexes = 6;
+    cube_front.renderingMode = GL_TRIANGLES;
 
     // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
-    g_VirtualScene["cube_sides"] = cube_sides;
+    g_VirtualScene["cube_front"] = cube_front;
+
+    SceneObject cube_right;
+    cube_right.name = "Direita do cubo";
+    cube_right.firstIndex = 6 * sizeof(unsigned int);;
+    cube_right.numIndexes = 6;
+    cube_right.renderingMode = GL_TRIANGLES;
+
+    // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
+    g_VirtualScene["cube_right"] = cube_right;
+
+    SceneObject cube_back;
+    cube_back.name = "Costas do cubo";
+    cube_back.firstIndex = 12 * sizeof(unsigned int);;
+    cube_back.numIndexes = 6;
+    cube_back.renderingMode = GL_TRIANGLES;
+
+    // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
+    g_VirtualScene["cube_back"] = cube_back;
+
+    SceneObject cube_left;
+    cube_left.name = "Esquerda do cubo";
+    cube_left.firstIndex = 18 * sizeof(unsigned int);;
+    cube_left.numIndexes = 6;
+    cube_left.renderingMode = GL_TRIANGLES;
+
+    // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
+    g_VirtualScene["cube_left"] = cube_left;
 
     SceneObject cube_top;
     cube_top.name = "Topo do cubo";
