@@ -1,5 +1,5 @@
 CC = g++
-FLAGS = -std=c++17 -O0 -Wall -Wextra -Wpedantic -Wno-unused-function 
+FLAGS = -std=c++17 -O2 -s -DNDEBUG -Wall -Wextra -Wpedantic -Wno-unused-function 
 
 BUILD_FOLDER = bin
 SRC_FOLDER = src

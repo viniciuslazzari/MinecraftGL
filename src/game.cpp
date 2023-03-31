@@ -10,7 +10,7 @@
 #include <glfw/glfw3.h>
 
 #include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/string_cast.hpp> // for glm::to_string
+#include <glm/gtx/string_cast.hpp>
 #include <glm/mat4x4.hpp>
 
 #include "std/matrices.h"
@@ -28,249 +28,233 @@
 #include "window_provider.hpp"
 #include "bezier.hpp"
 
+#define COW 4
+#define LEAF 5
 #define BEZIER_SPEED 0.1
 
 GLuint BuildTriangles();
 bool spawn = true;
 
 int game() {
-  WindowProvider windowProvider = WindowProvider(800, 800, "Teste");
+    WindowProvider windowProvider = WindowProvider(800, 800, "MInecraftGL");
 
-  GLFWwindow *window = windowProvider.initWindow(
-      ErrorCallback, KeyCallback, MouseButtonCallback, CursorPosCallback,
-      ScrollCallback, FramebufferSizeCallback);
+    GLFWwindow *window = windowProvider.initWindow(
+        ErrorCallback, KeyCallback, MouseButtonCallback, 
+        CursorPosCallback, ScrollCallback, FramebufferSizeCallback
+    );
 
-  // Carregamento de todas funções definidas por OpenGL 3.3, utilizando a
-  // biblioteca GLAD.
-  gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+    // Carregamento de todas funções definidas por OpenGL 3.3, utilizando a
+    // biblioteca GLAD.
+    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
-  ShadersProvider shaderProvider = ShadersProvider();
+    ShadersProvider shaderProvider = ShadersProvider();
 
-  // Carregamos os shaders de vértices e de fragmentos que serão utilizados
-  // para renderização. Veja slides 180-200 do documento
-  // Aula_03_Rendering_Pipeline_Grafico.pdf.
-  GLuint programId = shaderProvider.loadShadersFromFiles();
+    GLuint programId = shaderProvider.loadShadersFromFiles();
 
-  ObjModel shellModel("assets/shell.obj");
-  shellModel.ComputeNormals();
-  shellModel.BuildTrianglesAndAddToVirtualScene();
+    ObjModel shellModel("assets/shell.obj");
+    shellModel.ComputeNormals();
+    shellModel.BuildTrianglesAndAddToVirtualScene();
 
-  ObjModel leafModel("assets/leaf.obj");
-  leafModel.ComputeNormals();
-  leafModel.BuildTrianglesAndAddToVirtualScene();
+    ObjModel leafModel("assets/leaf.obj");
+    leafModel.ComputeNormals();
+    leafModel.BuildTrianglesAndAddToVirtualScene();
 
-  // Construímos a representação de um triângulo
-  GLuint vertex_array_object_id = BuildTriangles();
+    // Construímos a representação de um triângulo
+    GLuint vertex_array_object_id = BuildTriangles();
 
-  // Buscamos o endereço das variáveis definidas dentro do Vertex Shader.
-  // Utilizaremos estas variáveis para enviar dados para a placa de vídeo
-  // (GPU)! Veja arquivo "shader_vertex.glsl".
-  GLint model_uniform =
-      glGetUniformLocation(programId, "model"); // Variável da matriz "model"
-  GLint view_uniform = glGetUniformLocation(
-      programId, "view"); // Variável da matriz "view" em shader_vertex.glsl
-  GLint projection_uniform = glGetUniformLocation(
-      programId,
-      "projection"); // Variável da matriz "projection" em shader_vertex.glsl
-  GLint object_id_uniform = glGetUniformLocation(
-      programId, "object_id"); // Variável booleana em shader_vertex.glsl
-  GLint sampler_uniform = glGetUniformLocation(programId, "sampler");
+    // Buscamos o endereço das variáveis definidas dentro do Vertex Shader.
+    // Utilizaremos estas variáveis para enviar dados para a placa de vídeo
+    GLint model_uniform = glGetUniformLocation(programId, "model"); // Variável da matriz "model"
+    GLint view_uniform = glGetUniformLocation(programId, "view"); // Variável da matriz "view" em shader_vertex.glsl
+    GLint projection_uniform = glGetUniformLocation(programId, "projection"); // Variável da matriz "projection" em shader_vertex.glsl
+    GLint object_id_uniform = glGetUniformLocation(programId, "object_id"); // Variável booleana em shader_vertex.glsl
+    GLint sampler_uniform = glGetUniformLocation(programId, "sampler"); // Variável sampler para mapeamento de textura
 
-  PerlinNoise pn = PerlinNoise(MAP_SIZE, MAP_SIZE);
+    PerlinNoise pn = PerlinNoise(MAP_SIZE, MAP_SIZE);
 
-  vector<vector<float>> map = pn.generateNoise(6);
+    vector<vector<float>> map = pn.generateNoise(6);
 
-  // Habilitamos o Z-buffer. Veja slides 104-116 do documento
-  // Aula_09_Projecoes.pdf.
-  glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
 
-  Texture skyBack = Texture("assets/sky_back.png", GL_TEXTURE_2D);
-  skyBack.load();
-  Texture skyDown = Texture("assets/sky_down.png", GL_TEXTURE_2D);
-  skyDown.load();
-  Texture skyUp = Texture("assets/sky_up.png", GL_TEXTURE_2D);
-  skyUp.load();
-  Texture skyRight = Texture("assets/sky_right.png", GL_TEXTURE_2D);
-  skyRight.load();
-  Texture skyLeft = Texture("assets/sky_left.png", GL_TEXTURE_2D);
-  skyLeft.load();
-  Texture skyFront = Texture("assets/sky_front.png", GL_TEXTURE_2D);
-  skyFront.load();
+    // Texture skyBack = Texture("assets/sky_back.png", GL_TEXTURE_2D);
+    // skyBack.load();
 
-  Texture grassSideTexture = Texture("assets/grass_side.png", GL_TEXTURE_2D);
-  grassSideTexture.load();
+    // Texture skyDown = Texture("assets/sky_down.png", GL_TEXTURE_2D);
+    // skyDown.load();
 
-  Texture grassTopTexture = Texture("assets/grass_top.jpg", GL_TEXTURE_2D);
-  grassTopTexture.load();
+    // Texture skyUp = Texture("assets/sky_up.png", GL_TEXTURE_2D);
+    // skyUp.load();
 
-  Texture dirtTexture = Texture("assets/dirt.png", GL_TEXTURE_2D);
-  dirtTexture.load();
+    // Texture skyRight = Texture("assets/sky_right.png", GL_TEXTURE_2D);
+    // skyRight.load();
 
-  Texture cowTexture = Texture("assets/shell.jpg", GL_TEXTURE_2D);
-  cowTexture.load();
+    // Texture skyLeft = Texture("assets/sky_left.png", GL_TEXTURE_2D);
+    // skyLeft.load();
 
-  Texture leafTexture = Texture("assets/leaf.jpg", GL_TEXTURE_2D);
-  leafTexture.load();
+    // Texture skyFront = Texture("assets/sky_front.png", GL_TEXTURE_2D);
+    // skyFront.load();
 
-  BezierCurve bezier = BezierCurve();
+    Texture grassSideTexture = Texture("assets/grass_side.png", GL_TEXTURE_2D);
+    grassSideTexture.load();
 
-  float elapsedTime, timeSinceLastFrame = 0.0f;
+    Texture grassTopTexture = Texture("assets/grass_top.jpg", GL_TEXTURE_2D);
+    grassTopTexture.load();
 
-  float c = 0.0f;
+    Texture cowTexture = Texture("assets/shell.jpg", GL_TEXTURE_2D);
+    cowTexture.load();
 
-  // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
-  while (!glfwWindowShouldClose(window)) {
-    elapsedTime = glfwGetTime();
-    deltaTime = elapsedTime - timeSinceLastFrame;
-    timeSinceLastFrame = elapsedTime;
+    Texture leafTexture = Texture("assets/leaf.jpg", GL_TEXTURE_2D);
+    leafTexture.load();
 
-    // 135, 206, 235
-    float r = 135.0f/255.0f;
-    float g = 206.0f/255.0f;
-    float b =  235.0f/255.0f;
+    BezierCurve bezier = BezierCurve();
 
-    glClearColor(r, g, b, 1.0f);
+    float elapsedTime, timeSinceLastFrame = 0.0f;
 
-    // "Pintamos" todos os pixels do framebuffer com a cor definida acima,
-    // e também resetamos todos os pixels do Z-buffer (depth buffer).
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    float c = 0.0f;
 
-    // Pedimos para a GPU utilizar o programa de GPU criado acima (contendo
-    // os shaders de vértice e fragmentos).
-    glUseProgram(programId);
+    // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
+    while (!glfwWindowShouldClose(window)) {
+        elapsedTime = glfwGetTime();
+        deltaTime = elapsedTime - timeSinceLastFrame;
+        timeSinceLastFrame = elapsedTime;
 
-    // "Ligamos" o VAO. Informamos que queremos utilizar os atributos de
-    // vértices apontados pelo VAO criado pela função BuildTriangles(). Veja
-    // comentários detalhados dentro da definição de BuildTriangles().
-    glBindVertexArray(vertex_array_object_id);
+        // 135, 206, 235
+        float r = 135.0f/255.0f;
+        float g = 206.0f/255.0f;
+        float b =  235.0f/255.0f;
 
-    glm::mat4 view = camera.getView();
-    glm::mat4 projection = camera.getProjection();
+        glClearColor(r, g, b, 1.0f);
 
-    glUniformMatrix4fv(view_uniform, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(projection_uniform, 1, GL_FALSE,
-                       glm::value_ptr(projection));
+        // "Pintamos" todos os pixels do framebuffer com a cor definida acima,
+        // e também resetamos todos os pixels do Z-buffer (depth buffer).
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glUniform1i(sampler_uniform, 0);
+        // Pedimos para a GPU utilizar o programa de GPU criado acima (contendo
+        // os shaders de vértice e fragmentos).
+        glUseProgram(programId);
 
-    int init = -MAP_SIZE / 2;
+        // "Ligamos" o VAO. Informamos que queremos utilizar os atributos de
+        // vértices apontados pelo VAO criado pela função BuildTriangles(). Veja
+        // comentários detalhados dentro da definição de BuildTriangles().
+        glBindVertexArray(vertex_array_object_id);
 
-    glm::mat4 model;
+        glm::mat4 view = camera.getView();
+        glm::mat4 projection = camera.getProjection();
 
-    for (int i = 0; i < MAP_SIZE; ++i) {
-      for (int j = 0; j < MAP_SIZE; j++) {
-        model =
-            Matrix_Translate(init + i * 1.0f, map[i][j] - 20, init + j * 1.0f);
+        glUniformMatrix4fv(view_uniform, 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(projection_uniform, 1, GL_FALSE, glm::value_ptr(projection));
 
-        mapData[i][j] = model[3];
+        glUniform1i(sampler_uniform, 0);
+
+        int init = -MAP_SIZE / 2;
+
+        glm::mat4 model;
+
+        for (int i = 0; i < MAP_SIZE; ++i) {
+            for (int j = 0; j < MAP_SIZE; j++) {
+                model = Matrix_Translate(init + i * 1.0f, map[i][j] - 20, init + j * 1.0f);
+
+                mapData[i][j] = model[3];
+
+                glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+
+                grassSideTexture.bind(GL_TEXTURE0);
+
+                glDrawElements(g_VirtualScene["cube_sides"].renderingMode,
+                    g_VirtualScene["cube_sides"].numIndexes, GL_UNSIGNED_INT,
+                    (void *)g_VirtualScene["cube_sides"].firstIndex
+                );
+
+                grassTopTexture.bind(GL_TEXTURE0);
+
+                glDrawElements(g_VirtualScene["cube_top"].renderingMode,
+                    g_VirtualScene["cube_top"].numIndexes, GL_UNSIGNED_INT,
+                    (void *)g_VirtualScene["cube_top"].firstIndex
+                );
+            }
+        }
+
+        glm::vec3 initialPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+        float speed = 5.0f;
+
+        // Define the elapsed time since the start of the program
+        float defTime = glfwGetTime();
+
+        camera.positionFree.y= -speed * defTime; 
+        collideCameraWithMap(camera.positionFree, mapData);
+        collideCameraWithShell(camera.positionFree, shellPosition);
+
+        if (spawn){
+            srand(time(NULL));
+            shellPosition.x = rand()%60-30;
+            shellPosition.z = rand()%60-30;
+            spawn = false;
+        }
+
+        // Calculate the new position of the model based on the elapsed time
+        if (!collideShellWithMap(shellPosition, mapData)) {
+            shellPosition.y =  -speed * defTime;
+        } else {
+            int cowX = int(shellPosition.x) -1 +  MAP_SIZE / 2;
+            int cowZ = int(shellPosition.z) -1 + MAP_SIZE / 2;
+            shellPosition.y =  mapData[cowX][cowZ].y + 1.25f;
+        }
+
+        cowTexture.bind(GL_TEXTURE0);
+
+        model = Matrix_Translate(initialPosition.x, initialPosition.y, initialPosition.z)
+            * Matrix_Translate(shellPosition.x, shellPosition.y, shellPosition.z) 
+            * Matrix_Rotate_Y(shellRotate.y)
+            * Matrix_Scale(0.01f, 0.01f, 0.01f);
 
         glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(object_id_uniform, COW);
+        shellModel.DrawVirtualObject("shell");
 
-        grassSideTexture.bind(GL_TEXTURE0);
+        // BEZIER
 
-        glDrawElements(g_VirtualScene["cube_sides"].renderingMode,
-                       g_VirtualScene["cube_sides"].numIndexes, GL_UNSIGNED_INT,
-                       (void *)g_VirtualScene["cube_sides"].firstIndex);
+        glm::vec4 p0 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+        glm::vec4 p1 = glm::vec4(10.0f, -4.0f, 0.0f, 0.0f);
+        glm::vec4 c0 = glm::vec4(-10.0f, -6.0f, 0.0f, 0.0f);
+        glm::vec4 c1 = glm::vec4(0.0f, -10.0f, 0.0f, 0.0f);
 
-        grassTopTexture.bind(GL_TEXTURE0);
+        if (c > 1.0f) c = 0.0f;
+        
+        glm::vec4 point = bezier.calculate(p0, p1, c0, c1, c);
 
-        glDrawElements(g_VirtualScene["cube_top"].renderingMode,
-                       g_VirtualScene["cube_top"].numIndexes, GL_UNSIGNED_INT,
-                       (void *)g_VirtualScene["cube_top"].firstIndex);
+        c += BEZIER_SPEED * deltaTime;
 
-        dirtTexture.bind(GL_TEXTURE0);
+        model = Matrix_Identity() * Matrix_Translate(point[0], point[1], 0);
 
-        glDrawElements(g_VirtualScene["cube_base"].renderingMode,
-                       g_VirtualScene["cube_base"].numIndexes, GL_UNSIGNED_INT,
-                       (void *)g_VirtualScene["cube_base"].firstIndex);
-      }
+        leafTexture.bind(GL_TEXTURE0);
+
+        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(object_id_uniform, LEAF);
+        leafModel.DrawVirtualObject("the_leaf");
+
+        // O framebuffer onde OpenGL executa as operações de renderização não
+        // é o mesmo que está sendo mostrado para o usuário, caso contrário
+        // seria possível ver artefatos conhecidos como "screen tearing". A
+        // chamada abaixo faz a troca dos buffers, mostrando para o usuário
+        // tudo que foi renderizado pelas funções acima.
+        glfwSwapBuffers(window);
+
+        // Verificamos com o sistema operacional se houve alguma interação do
+        // usuário (teclado, mouse, ...). Caso positivo, as funções de callback
+        // definidas anteriormente usando glfwSet*Callback() serão chamadas
+        // pela biblioteca GLFW.
+        glfwPollEvents();
+
+        if(win){
+            break;
+        }
     }
 
+    // Finalizamos o uso dos recursos do sistema operacional
+    glfwTerminate();
 
-    #define COW 4
-    glm::vec3 initialPosition = glm::vec3(0.0f, 0.0f, 0.0f);
-    float speed = 5.0f;
-
-    // Define the elapsed time since the start of the program
-    float defTime = glfwGetTime();
-    camera.positionFree.y= -speed * defTime; 
-    collideCameraWithMap(camera.positionFree, mapData);
-    collideCameraWithShell(camera.positionFree, shellPosition);
-    if (spawn){
-        srand(time(NULL));
-        shellPosition.x = rand()%60-30;
-        shellPosition.z = rand()%60-30;
-        spawn = false;
-    }
-
-    // Calculate the new position of the model based on the elapsed time
-    if (!collideShellWithMap(shellPosition, mapData)) {
-        shellPosition.y =  -speed * defTime;
-    } else {
-        int cowX = int(shellPosition.x) -1 +  MAP_SIZE / 2;
-        int cowZ = int(shellPosition.z) -1 + MAP_SIZE / 2;
-        shellPosition.y =  mapData[cowX][cowZ].y + 1.25f;
-    }
-
-    cowTexture.bind(GL_TEXTURE0);
-
-    model = Matrix_Translate(initialPosition.x, initialPosition.y, initialPosition.z)
-          * Matrix_Translate(shellPosition.x, shellPosition.y, shellPosition.z) 
-          * Matrix_Rotate_Y(shellRotate.y)
-          * Matrix_Scale(0.01f, 0.01f, 0.01f);
-
-    glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-    glUniform1i(object_id_uniform, COW);
-    shellModel.DrawVirtualObject("shell");
-
-    // BEZIER
-
-    glm::vec4 p0 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-    glm::vec4 p1 = glm::vec4(10.0f, -4.0f, 0.0f, 0.0f);
-    glm::vec4 c0 = glm::vec4(-10.0f, -6.0f, 0.0f, 0.0f);
-    glm::vec4 c1 = glm::vec4(0.0f, -10.0f, 0.0f, 0.0f);
-
-    if (c > 1.0f) c = 0.0f;
-    
-    glm::vec4 point = bezier.calculate(p0, p1, c0, c1, c);
-
-    c += BEZIER_SPEED * deltaTime;
-
-    model = Matrix_Identity() * Matrix_Translate(point[0], point[1], 0);
-
-    #define LEAF 5
-
-    leafTexture.bind(GL_TEXTURE0);
-
-    glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-    glUniform1i(object_id_uniform, LEAF);
-    leafModel.DrawVirtualObject("the_leaf");
-
-    // O framebuffer onde OpenGL executa as operações de renderização não
-    // é o mesmo que está sendo mostrado para o usuário, caso contrário
-    // seria possível ver artefatos conhecidos como "screen tearing". A
-    // chamada abaixo faz a troca dos buffers, mostrando para o usuário
-    // tudo que foi renderizado pelas funções acima.
-    // Veja o link:
-    // https://en.wikipedia.org/w/index.php?title=Multiple_buffering&oldid=793452829#Double_buffering_in_computer_graphics
-    glfwSwapBuffers(window);
-
-    // Verificamos com o sistema operacional se houve alguma interação do
-    // usuário (teclado, mouse, ...). Caso positivo, as funções de callback
-    // definidas anteriormente usando glfwSet*Callback() serão chamadas
-    // pela biblioteca GLFW.
-    glfwPollEvents();
-
-    if(win){
-        break;
-    }
-  }
-
-  // Finalizamos o uso dos recursos do sistema operacional
-  glfwTerminate();
-
-  // Fim do programa
-  return 0;
+    // Fim do programa
+    return 0;
 }
 
 // Cow movement with time acceleration, cowPostion is the cow position, deltaTime is the time between frames, shellPosition
@@ -312,12 +296,6 @@ GLuint BuildTriangles() {
         -0.5f, 0.5f, 0.5f, 1.0f,  // posição do vértice 17
         0.5f, 0.5f, 0.5f, 1.0f,   // posição do vértice 18
         0.5f, 0.5f, -0.5f, 1.0f,  // posição do vértice 19
-
-        // bottom face
-        -0.5f, -0.5f, -0.5f, 1.0f, // posição do vértice 16
-        -0.5f, -0.5f, 0.5f, 1.0f,  // posição do vértice 17
-        0.5f, -0.5f, 0.5f, 1.0f,   // posição do vértice 18
-        0.5f, -0.5f, -0.5f, 1.0f,  // posição do vértice 19
     };
 
     GLuint VBO_model_coefficients_id;
@@ -364,12 +342,6 @@ GLuint BuildTriangles() {
         0.0f, 1.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
-
-        // bottom face
-        0.0f, -1.0f, 0.0f, 0.0f,
-        0.0f, -1.0f, 0.0f, 0.0f,
-        0.0f, -1.0f, 0.0f, 0.0f,
-        0.0f, -1.0f, 0.0f, 0.0f,
     };
 
     GLuint VBO_normal_coefficients_id;
@@ -389,7 +361,6 @@ GLuint BuildTriangles() {
         0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // back face
         0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // left face
         0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // top face
-        0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // bottom face
     };
 
     GLuint VBO_texture_coefficients_id;
@@ -403,85 +374,56 @@ GLuint BuildTriangles() {
     glEnableVertexAttribArray(location);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-  GLuint indices[] = {0,  1,  2, // triângulo 1
-                      0,  2,  3, // triângulo 2
-                      4,  5,  6,  
-                      4,  6,  7,  
-                      8,  9,  10, 
-                      8, 10, 11, 
-                      12, 13, 14, 
-                      12, 14, 15, 
-                      16, 17, 18, 
-                      16, 18, 19, 
-                      20, 21, 22, 
-                      20, 22, 23};
+    GLuint indices[] = {
+        0, 1, 2,
+        0, 2, 3,
+        4, 5, 6,  
+        4, 6, 7,  
+        8, 9, 10, 
+        8, 10, 11, 
+        12, 13, 14, 
+        12, 14, 15, 
+        16, 17, 18, 
+        16, 18, 19
+    };
 
-  // Criamos um primeiro objeto virtual (SceneObject) que se refere às faces
-  // coloridas do cubo.
-  SceneObject cube_sides;
-  cube_sides.name = "Lados do cubo";
-  cube_sides.firstIndex = 0; // Primeiro índice está em indices[0]
-  cube_sides.numIndexes =
-      24; // Último índice está em indices[35]; total de 36 índices.
-  cube_sides.renderingMode = GL_TRIANGLES; // Índices correspondem ao tipo de
-                                           // rasterização GL_TRIANGLES.
 
-  // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
-  g_VirtualScene["cube_sides"] = cube_sides;
+    SceneObject cube_sides;
+    cube_sides.name = "Lados do cubo";
+    cube_sides.firstIndex = 0;
+    cube_sides.numIndexes = 24;
+    cube_sides.renderingMode = GL_TRIANGLES;
 
-  // Criamos um primeiro objeto virtual (SceneObject) que se refere às faces
-  // coloridas do cubo.
-  SceneObject cube_top;
-  cube_top.name = "Topo do cubo";
-  cube_top.firstIndex =
-      24 * sizeof(unsigned int); // Primeiro índice está em indices[0]
-  cube_top.numIndexes =
-      6; // Último índice está em indices[35]; total de 36 índices.
-  cube_top.renderingMode = GL_TRIANGLES; // Índices correspondem ao tipo de
-                                         // rasterização GL_TRIANGLES.
+    // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
+    g_VirtualScene["cube_sides"] = cube_sides;
 
-  // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
-  g_VirtualScene["cube_top"] = cube_top;
+    SceneObject cube_top;
+    cube_top.name = "Topo do cubo";
+    cube_top.firstIndex = 24 * sizeof(unsigned int);
+    cube_top.numIndexes = 6;
+    cube_top.renderingMode = GL_TRIANGLES; 
 
-  // Criamos um primeiro objeto virtual (SceneObject) que se refere às faces
-  // coloridas do cubo.
-  SceneObject cube_base;
-  cube_base.name = "Base do cubo";
-  cube_base.firstIndex =
-      30 * sizeof(unsigned int); // Primeiro índice está em indices[0]
-  cube_base.numIndexes =
-      6; // Último índice está em indices[35]; total de 36 índices.
-  cube_base.renderingMode = GL_TRIANGLES; // Índices correspondem ao tipo de
-                                          // rasterização GL_TRIANGLES.
+    // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
+    g_VirtualScene["cube_top"] = cube_top;
 
-  // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
-  g_VirtualScene["cube_base"] = cube_base;
+    // Criamos um buffer OpenGL para armazenar os índices acima
+    GLuint indices_id;
+    glGenBuffers(1, &indices_id);
 
-  // Criamos um buffer OpenGL para armazenar os índices acima
-  GLuint indices_id;
-  glGenBuffers(1, &indices_id);
+    // "Ligamos" o buffer. Note que o tipo agora é GL_ELEMENT_ARRAY_BUFFER.
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_id);
 
-  // "Ligamos" o buffer. Note que o tipo agora é GL_ELEMENT_ARRAY_BUFFER.
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_id);
+    // Alocamos memória para o buffer.
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), NULL, GL_STATIC_DRAW);
 
-  // Alocamos memória para o buffer.
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), NULL, GL_STATIC_DRAW);
+    // Copiamos os valores do array indices[] para dentro do buffer.
+    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(indices), indices);
 
-  // Copiamos os valores do array indices[] para dentro do buffer.
-  glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(indices), indices);
+    // "Desligamos" o VAO, evitando assim que operações posteriores venham a
+    // alterar o mesmo. Isso evita bugs.
+    glBindVertexArray(0);
 
-  // NÃO faça a chamada abaixo! Diferente de um VBO (GL_ARRAY_BUFFER), um
-  // array de índices (GL_ELEMENT_ARRAY_BUFFER) não pode ser "desligado",
-  // caso contrário o VAO irá perder a informação sobre os índices.
-  //
-  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // XXX Errado!
-  //
-
-  // "Desligamos" o VAO, evitando assim que operações posteriores venham a
-  // alterar o mesmo. Isso evita bugs.
-  glBindVertexArray(0);
-
-  // Retornamos o ID do VAO. Isso é tudo que será necessário para renderizar
-  // os triângulos definidos acima. Veja a chamada glDrawElements() em main().
-  return vertex_array_object_id;
+    // Retornamos o ID do VAO. Isso é tudo que será necessário para renderizar
+    // os triângulos definidos acima. Veja a chamada glDrawElements() em main().
+    return vertex_array_object_id;
 }

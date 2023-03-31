@@ -109,10 +109,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     if (key == GLFW_KEY_LEFT && (action == GLFW_PRESS || action == GLFW_REPEAT)) CowMovement(2);
     // smooth translation right arrow key, using acceleration x axis based on time, change shellPosition to change speed using multiplication for accel
     if (key == GLFW_KEY_RIGHT && (action == GLFW_PRESS || action == GLFW_REPEAT)) CowMovement(3);
-
-
-    
-    
 }
 
 // Definimos o callback para impressão de erros da GLFW no terminal
